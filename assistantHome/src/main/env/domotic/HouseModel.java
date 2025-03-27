@@ -29,7 +29,11 @@ public class HouseModel extends GridWorldModel {
     boolean fridgeOpen   = false; // whether the fridge is open                                   
     boolean carryingDrug = false; // whether the robot is carrying drug
 	//estas variables no la necesitamos porque cada medicamento tiene su cantidad disponible en el hashmap
+
     int sipCount        = 0; // how many sip the owner did
+	//esta variable en principio tampoco se necesita a menos que de un medicamento se vaya a tomar varias 
+	//dosis (no creo)
+
     //int availableDrugs  = 2; // how many drugs are available
     
 	// Initialization of the objects Location on the domotic home scene 
@@ -87,6 +91,8 @@ public class HouseModel extends GridWorldModel {
                                                                         
         // initial location of robot (column 3, line 3)
         // ag code 0 means the robot
+
+		//Deberia haber una estacion de carga del robot, es esta?
         setAgPos(0, 19, 10);  
 		setAgPos(1, 23, 8);
 		//setAgPos(2, GSize*2-1, GSize*3/5);
