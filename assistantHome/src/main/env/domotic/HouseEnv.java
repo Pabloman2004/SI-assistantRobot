@@ -10,14 +10,14 @@ public class HouseEnv extends Environment {
     // common literals
     public static final Literal of   = Literal.parseLiteral("open(fridge)");
     public static final Literal clf  = Literal.parseLiteral("close(fridge)");
-    public static final Literal gb   = Literal.parseLiteral("get(drug)");
-    public static final Literal hb   = Literal.parseLiteral("hand_in(drug)");
-    public static final Literal sb   = Literal.parseLiteral("sip(drug)");
+    public static final Literal gd  = Literal.parseLiteral("get(drug)");
+    public static final Literal hd   = Literal.parseLiteral("hand_in(drug)");
+    public static final Literal sd   = Literal.parseLiteral("sip(drug)");
     public static final Literal hob  = Literal.parseLiteral("has(owner,drug)");
 
-    public static final Literal af   = Literal.parseLiteral("at(enfermera,fridge)");
-    public static final Literal ao   = Literal.parseLiteral("at(enfermera,owner)");
-    public static final Literal ad   = Literal.parseLiteral("at(enfermera,delivery)");
+    public static final Literal ef   = Literal.parseLiteral("at(enfermera,fridge)");
+    public static final Literal eo   = Literal.parseLiteral("at(enfermera,owner)");
+    public static final Literal ed   = Literal.parseLiteral("at(enfermera,delivery)");
 	
     public static final Literal oaf  = Literal.parseLiteral("at(owner,fridge)");
     public static final Literal oac1 = Literal.parseLiteral("at(owner,chair1)");
@@ -76,6 +76,7 @@ public class HouseEnv extends Environment {
 			lRobot.distance(model.lDoorBed2)==0 	||
 			lRobot.distance(model.lDoorBed3)==0 	  ) {
 			addPercept("enfermera", Literal.parseLiteral("atDoor"));//creo que lo que quiere decir es que si enfrente tiene un obstaculo le pasa la creencia de que esta enfrente de un obstaculo lo que no se porque le pasa atDoor
+			//Creo que pasa el atDoor para verificar si tiene puertas cerca
 		}; 
 		
 		if (lOwner.distance(model.lDoorHome)==0 	||
@@ -133,7 +134,7 @@ public class HouseEnv extends Environment {
 		Location lOwner = model.getAgPos(1);
 		
         if (lRobot.distance(model.lFridge)<2) {
-            addPercept("enfermera", af);
+            addPercept("enfermera", ef);
         } 
 		
         if (lOwner.distance(model.lFridge)<2) {
@@ -141,11 +142,11 @@ public class HouseEnv extends Environment {
         } 
 		
         if (lRobot.distance(lOwner)==1) {                                                     
-            addPercept("enfermera", ao);
+            addPercept("enfermera", eo);
         }
 
         if (lRobot.distance(model.lDeliver)==1) {
-            addPercept("enfermera", ad);
+            addPercept("enfermera", ed);
         }
 
         if (lOwner.distance(model.lChair1)==0) {
@@ -286,13 +287,13 @@ public class HouseEnv extends Environment {
             }     
 //aqui va a haber que pasarle el tipo de medicamento que se tiene que tomar, pero hay que crear un metodo entiendo que en esta clase que 
 //mida el tiempo en el que se tomo el ultimo medicamento y si ha pasado el tiempo para que se lo pueda tomar
-        } else if (action.equals(gb)) {
+        } else if (action.equals(gd)) {
             result = model.getDrug("Simvastatina");
 
-        } else if (action.equals(hb)) {
+        } else if (action.equals(hd)) {
             result = model.handInDrug();
 
-        } else if (action.equals(sb)) {
+        } else if (action.equals(sd)) {
             result = model.sipDrug();
 
         } else if (action.getFunctor().equals("deliver")) {
