@@ -27,7 +27,8 @@ available(drug, fridge).
 
 // my owner should not consume more than 10 drugs a day :-)
 // drug va a haber que cambiarlo por un tipo de medicamento
-limit(drug,5).  
+limit(drug,5).
+limit(droga,3).  
 
 //en tiendo que B es el medicamento y Ag es el agente
 too_much(B, Ag) :-
@@ -65,7 +66,7 @@ orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).
 		              // is to inform that the owner has the drug in his hand and could begin to drink
 		?has(Ag, drug);  // If the previous action is completed then a perception from environment must update
 		                 // the beliefs of the robot
-						 
+						
 		// remember that another drug has been consumed
 		.date(YY, MM, DD); .time(HH, NN, SS);
 		+consumed(YY, MM, DD, HH, NN, SS, drug, Ag);
@@ -131,7 +132,7 @@ orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).
 	!go(P);                                        
 	.println("Checking if is at ", P, " ============>");
 	!at(Ag, P).            
-	                                                   
+	                                                
 +!go(P) : atRoom(RoomAg) & atRoom(P, RoomAg) <- 
 	.println("<================== 1 =====================>");
 	.println("Al estar en la misma habitación se debe mover directamente a: ", P);
@@ -189,11 +190,11 @@ orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).
 +stock(drug, N)
    :  N > 0 & not available(drug, fridge)
    <- +available(drug, fridge).     
-   
+
 +chat(Msg)[source(Ag)] : answer(Msg, Answ) <-  
 	.println("El agente ", Ag, " me ha chateado: ", Msg);
 	.send(Ag, tell, msg(Answ)). 
-                                     
+                                    
 +?time(T) : true
   <-  time.check(T).
 

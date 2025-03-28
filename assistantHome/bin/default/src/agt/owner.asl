@@ -84,21 +84,25 @@ connect(livingroom, hallway, doorSal2).
 	sit(sofa);
 	.wait(5000);
 	!at(Ag, fridge);
-	.wait(10000);
+	.wait(3000);
 	!at(Ag, chair3);
 	sit(chair3);
 	-busy.
 +!open : .my_name(Ag) & busy <-
 	.println("Owner is doing something now and could not open the door");
-	.wait(8000);
+	.wait(4000);
 	!open.
  
 +!sit : .my_name(Ag) & not busy <- 
 	+busy; 
-	.println("Owner goes to the fridge to get a beer.");
+	.println("Owner goes to the fridge to get a medicine.");
 	.wait(1000);
 	!at(Ag, fridge);
 	.println("Owner is hungry and is at the fridge getting something"); 
+	//las tres lineas de abajo no funcionan
+	//open(fridge); // Change it by an internal operation similar to fridge.open
+	//get(drug);    // Change it by a set of internal operations that recognize the drug an take it
+	//close(fridge);
 	//.println("He llegado al frigorifico");
 	.wait(2000);
 	!at(Ag, chair3);

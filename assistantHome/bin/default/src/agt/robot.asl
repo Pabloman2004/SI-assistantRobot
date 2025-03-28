@@ -131,7 +131,7 @@ orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).
 	!go(P);                                        
 	.println("Checking if is at ", P, " ============>");
 	!at(Ag, P).            
-	                                                   
+	                                                
 +!go(P) : atRoom(RoomAg) & atRoom(P, RoomAg) <- 
 	.println("<================== 1 =====================>");
 	.println("Al estar en la misma habitación se debe mover directamente a: ", P);
@@ -189,11 +189,11 @@ orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).
 +stock(drug, N)
    :  N > 0 & not available(drug, fridge)
    <- +available(drug, fridge).     
-   
+
 +chat(Msg)[source(Ag)] : answer(Msg, Answ) <-  
 	.println("El agente ", Ag, " me ha chateado: ", Msg);
 	.send(Ag, tell, msg(Answ)). 
-                                     
+                                    
 +?time(T) : true
   <-  time.check(T).
 

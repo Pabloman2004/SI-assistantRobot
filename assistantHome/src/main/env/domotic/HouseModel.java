@@ -4,6 +4,7 @@ import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.Area;
 import jason.environment.grid.Location;
 import java.util.HashMap;
+import java.util.HashSet;
 //import jason.asSyntax.*;
 
 /** class that implements the Model of Domestic Robot application */
@@ -27,7 +28,15 @@ public class HouseModel extends GridWorldModel {
 	public final int GridSize = 1080;    //Width
                         
     boolean fridgeOpen   = false; // whether the fridge is open                                   
-    boolean carryingDrug = false; // whether the robot is carrying drug
+    //boolean carryingDrug = false; // whether the robot is carrying drug
+	Set<Integer> carryingDrug  = new HashSet<Integer>();
+		int getAgentCode(String ag) {
+		if (ag.equals("owner"))   return OWNER;
+		if (ag.equals("cleaner")) return CLEANER;
+		if (ag.equals("dustman")) return DUSTMAN;
+		if (ag.equals("mover"))   return MOVER;
+		return -1;
+	}
 	//estas variables no la necesitamos porque cada medicamento tiene su cantidad disponible en el hashmap
     int sipCount        = 0; // how many sip the owner did
     //int availableDrugs  = 2; // how many drugs are available
@@ -144,6 +153,12 @@ public class HouseModel extends GridWorldModel {
 		 medicamentos.put("Ramipril ", 5);
 		
      }
+
+	 int getAgentCode(String ag) {
+		if (ag.equals("owner"))   return OWNER;
+		if (ag.equals("enfermera")) return CLEANER;
+		return -1;
+	}
 	
 
 	 String getRoom (Location thing){  
@@ -207,7 +222,7 @@ public class HouseModel extends GridWorldModel {
 	boolean canMoveTo (int Ag, int x, int y) {
 		if (Ag < 1) {// el agente 0 es la enfermera
 			return (isFree(x,y) && !hasObject(WASHER,x,y) && !hasObject(TABLE,x,y) &&
-		           !hasObject(SOFA,x,y) && !hasObject(CHAIR,x,y));
+		        !hasObject(SOFA,x,y) && !hasObject(CHAIR,x,y));
 		} else { //este agente es el paciente
 			return (isFree(x,y) && !hasObject(WASHER,x,y) && !hasObject(TABLE,x,y));
 		}
@@ -253,10 +268,13 @@ public class HouseModel extends GridWorldModel {
         return true;        
     }                                                                                 
 
-    boolean getDrug(String medicamento) {
-        if (fridgeOpen && medicamentosDisponible(medicamento) > 0 && !carryingDrug) {
+    boolean getDrug(String medicamento,String ag) {
+		int agentCode = getAgentCode(ag);
+        if (fridgeOpen && medicamentosDisponible(medicamento) > 0 && !carryingDrug.contains(ag)) {
             medicamentos.put(medicamento, medicamentos.get(medicamento)-1);
-            carryingDrug = true;
+            carryingDrug.add(agentCode);
+			if (view != null)
+				view.update(lFridge.x,lFridge.y);
             return true;
         } else {  
 			if (fridgeOpen) {

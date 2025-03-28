@@ -80,25 +80,34 @@ connect(livingroom, hallway, doorSal2).
 	!at(Ag, delivery);
 	.println("Owner is opening the door"); 
 	.random(X); .wait(X*7351+2000); // Owner takes a random amount of time to open the door 
+	.close(door);
 	!at(Ag, sofa);
 	sit(sofa);
 	.wait(5000);
 	!at(Ag, fridge);
-	.wait(10000);
+	.println("Owner is opening the door");
+	open(fridge);
+	get(drug);
+	close(fridge);
+	.wait(3000);
 	!at(Ag, chair3);
 	sit(chair3);
 	-busy.
 +!open : .my_name(Ag) & busy <-
 	.println("Owner is doing something now and could not open the door");
-	.wait(8000);
+	.wait(4000);
 	!open.
- 
+
 +!sit : .my_name(Ag) & not busy <- 
 	+busy; 
-	.println("Owner goes to the fridge to get a beer.");
+	.println("Owner goes to the fridge to get a medicine.");
 	.wait(1000);
 	!at(Ag, fridge);
 	.println("Owner is hungry and is at the fridge getting something"); 
+	//las tres lineas de abajo no funcionan
+	//open(fridge); // Change it by an internal operation similar to fridge.open
+	//get(drug);    // Change it by a set of internal operations that recognize the drug an take it
+	//close(fridge);
 	//.println("He llegado al frigorifico");
 	.wait(2000);
 	!at(Ag, chair3);
@@ -132,7 +141,7 @@ connect(livingroom, hallway, doorSal2).
 	!go(P);                                        
 	.println("Checking if is at ", P);
 	!at(Ag, P).            
-	                                                   
+	                                                
 +!go(P) : atRoom(RoomAg) & atRoom(P, RoomAg) <-                             
 	.println("Al estar en la misma habitación se debe mover directamente a: ", P);
 	move_towards(P).  

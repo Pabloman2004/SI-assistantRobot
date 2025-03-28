@@ -1,0 +1,6 @@
+1)Se han creado dos cargadores en el modelo, como en nuestro caso superábamos el número de elementos lo consideramos como otro cualquiera y en la vista lo modificamos.
+Uno de los cargadores será SIEMPRE usado por el auxiliar y el otro SIEMPRE por la enfermera.
+
+2) Hemos creado una serie de formas para cargarse, en el caso del auxiliar, cuando no está haciendo nada y tiene menos de un 75% de batería se va al cargador.
+En el caso del robot principal, tenemos un abanico que va desde una probabilidad del 25% de querer cargarse cuando está con un 90% de batería hasta una probabilidad
+de un 100% de querer cargarse cuando le queda un 25% de batería.

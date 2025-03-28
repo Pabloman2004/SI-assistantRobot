@@ -1,6 +1,6 @@
 package domotic;
 
-import jason.asSyntax.*;
+import jason.asSyntax.*; // Ensure java.lang.String is not excluded
 import jason.environment.Environment;
 import jason.environment.grid.Location;
 import java.util.logging.Logger;
@@ -181,12 +181,18 @@ public class HouseEnv extends Environment {
 
         if (model.fridgeOpen) {
             addPercept("enfermera", Literal.parseLiteral("stock(drug,"+model.medicamentosDisponible(medicamentos.Simvastatina.name())+")"));//cantidad de medicamentos en la nevera deja la nevera abierta hay que hacer que se cierre
-        }
+			addPercept("owner", Literal.parseLiteral("stock(drug,"+model.medicamentosDisponible(medicamentos.Simvastatina.name())+")"));
+		}
         if (model.sipCount > 0) {
             addPercept("enfermera", hob);
             addPercept("owner", hob);
         }
     }
+
+	public String pautaMedicamento(){
+		// tiene que devolver el medicamento que deberia tomar el owner
+		return "Take one tablet daily.";
+	}
 
 
 
