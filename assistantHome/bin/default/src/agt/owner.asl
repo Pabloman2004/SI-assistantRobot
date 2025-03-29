@@ -1,200 +1,141 @@
-/* Initial Beliefs */
-connect(kitchen, hall, doorKit1).
-connect(kitchen, hallway, doorKit2).
-connect(hall, kitchen, doorKit1).
-connect(hallway, kitchen, doorKit2).
-connect(bath1, hallway, doorBath1).
-connect(bath2, bedroom1, doorBath2).
-connect(hallway, bath1, doorBath1).
-connect(bedroom1, bath2, doorBath2).
-connect(bedroom1, hallway, doorBed1).
-connect(hallway, bedroom1, doorBed1).
-connect(bedroom2, hallway, doorBed2).
-connect(hallway, bedroom2, doorBed2).
-connect(bedroom3, hallway, doorBed3).
-connect(hallway, bedroom3, doorBed3).
-connect(hall,livingroom, doorSal1).                       
-connect(livingroom, hall, doorSal1).
-connect(hallway,livingroom, doorSal2).
-connect(livingroom, hallway, doorSal2).
-
 /* Initial goals */
+!pauta_medicamentos.
 
-// Owner will simulate the behaviour of a person 
-// We need to characterize their digital twin (DT)
-// Owner must record the DT data periodically 
-// Owner must access the historic data of such person
-// Owner will act randomly according to some problems
-// Owner will usually act with a behaviour normal
-// Owner problems will be activated by some external actions
-// Owner problems will randomly be activated on time
-// Owner will dialog with the nurse robot 
-// Owner will move randomly in the house by selecting places
+// Pautas: nombre, hora, frecuencia.
+pauta(paracetamol,8,6).
+pauta(ibuprofeno,12,6).
+pauta(lorazepam,22,23).
+pauta(aspirina,8,8).
+pauta(amoxicilina,15,2).
 
-!sit.
+// El robot controla los horarios y actualiza las pautas tras una consumición.
++pauta(M,H,F)[source(robot)] <- 
+    .abolish(pauta(M,H-F,_)).
 
-!open.
+// Enviamos al owner las pautas iniciales.
++!pauta_medicamentos 
+<- 
+    .findall(pauta(A,B,C),.belief(pauta(A,B,C)),L);
+    for (.member(I,L)) {
+        .send(enfermera,tell,I);
+    }.
 
-!walk.
+// El owner cambia las pautas aleatoriamente e informa al robot.
++!cambiarPauta(T) 
+<- 
+    .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+    .print("Reseteando medicinas:");
+    for (.member(pauta(M,H,F),L)) {
+        if (not H==T) {
+            .random([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],X);
+            if (not X==T) {
+                .abolish(pauta(M,H,F));
+                .print("Nueva pauta: [",M,",",X,",",F,"]");
+                +pauta(M,X,F);
+                .send(enfermera,tell,pautaNueva(M,X,F));
+            }
+        }
+    }.
 
-!wakeup.
+// Simulamos comportamiento aleatorio.
++!simulate_behaviour[source(self)] 
+<- 
+    .random(X); 
+    .wait(3000*X + 5000); // Espera un tiempo aleatorio
+    if (X < 0.5) {
+        .random([delivery,fridge,washer,retrete],Y);
+        .print("Voy a un sitio ",Y);
+        !go_at(owner,Y);
+    } elif (X < 0.7) {
+        .random([chair1,chair2,chair3,chair4,sofa],Y);
+        .print("Voy a sentarme en ",Y);
+        !go_at(owner,Y);
+        .print("Me siento");
+    } else {
+        .random([bed1,bed2,bed3],Y);
+        .print("Voy a echarme una siesta en ",Y);
+        !go_at(owner,Y);
+        .print("Me acuesto");
+    };
+    !simulate_behaviour.
 
-!check_bored.
+// Si es hora de la pauta, el owner puede decidir ir por la medicina.
++hour(H) 
+<- 
+    .random(X);
+    if (X < 0.9) {
+        .print("Voy a por medicinas");
+        .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+        if (not L == []) {
+            if (not .intend(tomarMedicina(L)) & not quieto) {
+                .print(L);
+                !tomarMedicina(L);
+            }
+        }
+    }.
 
-// Initially Owner could be: sit, opening the door, waking up, walking, ...
-//!sit.   			
-//!check_bored. 
+// Cuando decide tomar medicinas, detiene su comportamiento.
++!tomarMedicina(L)[source(self)] 
+<- 
+    if (.intend(simulate_behaviour)) {
+        .drop_intention(simulate_behaviour);
+    };
+    !tomar(owner,L);
+    !simulate_behaviour.
 
-//+!init <- !sit ||| !open ||| !walk ||| !wakeup ||| !check_bored.
+// Va al cabinet, toma la medicina e informa al robot.
++!tomar(owner,L)[source(self)] 
+<- 
+    !go_at(owner,cabinet);
+    if (not at(robot,cabinet) & not quieto) {
+        open(cabinet);
+        .send(robot,achieve,comprueba(L));
+        for (.member(pauta(M,H,F),L)) {
+            .abolish(pauta(M,H,F));
+            takeDrug(owner,M);
+            .print("He cogido la medicina ",M);
+            .send(robot,tell,comprobarConsumo(M));
+        };
+        for (.member(pauta(M,H,F),L)) {
+            handDrug(M);
+        };
+        close(cabinet);
+    }.
 
-+!wakeup : .my_name(Ag) & not busy <-
-	+busy;
-	!check_bored;
-	.println("Owner just woke up and needs to go to the fridge"); 
-	.wait(3000);
-	-busy;
-	!sit.
-+!wakeup : .my_name(Ag) & busy <-
-	.println("Owner is doing something now, is not asleep");
-	.wait(10000);
-	!wakeup.
-	
-+!walk : .my_name(Ag) & not busy <- 
-	+busy;  
-	.println("Owner is not busy, is sit down on the sofa");
-	.wait(500);
-	!at(Ag,sofa);
-	.wait(2000);
-	//.println("Owner is walking at home"); 
-	-busy;
-	!open.
-+!walk : .my_name(Ag) & busy <-
-	.println("Owner is doing something now and could not walk");
-	.wait(6000);
-	!walk.
+// Si el robot se adelanta, el owner espera.
++quieto 
+<- 
+    .print("Espero por mis medicinas");
+    if (.intend(tomarMedicina(_))) {
+        .drop_intention(tomarMedicina(_));
+    };
+    if (not .intend(simulate_behaviour)) {
+        !simulate_behaviour;
+    }.
 
-+!open : .my_name(Ag) & not busy <-
-	+busy;   
-	.println("Owner goes to the home door");
-	.wait(200);
-	!at(Ag, delivery);
-	.println("Owner is opening the door"); 
-	.random(X); .wait(X*7351+2000); // Owner takes a random amount of time to open the door 
-	!at(Ag, sofa);
-	sit(sofa);
-	.wait(5000);
-	!at(Ag, fridge);
-	.wait(10000);
-	!at(Ag, chair3);
-	sit(chair3);
-	-busy.
-+!open : .my_name(Ag) & busy <-
-	.println("Owner is doing something now and could not open the door");
-	.wait(8000);
-	!open.
- 
-+!sit : .my_name(Ag) & not busy <- 
-	+busy; 
-	.println("Owner goes to the fridge to get a beer.");
-	.wait(1000);
-	!at(Ag, fridge);
-	.println("Owner is hungry and is at the fridge getting something"); 
-	//.println("He llegado al frigorifico");
-	.wait(2000);
-	!at(Ag, chair3);
-	sit(chair3);
-	.wait(4000);
-	!at(Ag, chair4);
-	sit(chair4);
-	.wait(4000);
-	!at(Ag, chair2);
-	sit(chair2);
-	.wait(4000);
-	!at(Ag, chair1);
-	sit(chair1);
-	.wait(4000);
-	!at(Ag, sofa);
-	sit(sofa);
-	.wait(10000);
-	!get(drug); 
-	.wait(50000);
-	-busy.
-+!sit : .my_name(Ag) & busy <-
-	.println("Owner is doing something now and could not go to fridge");
-	.wait(30000);
-	!sit.
+// Movimiento básico con prioridad.
++!go_at(owner,P)[source(self)] : at(owner,P) 
+<- 
+    .print("He llegado a ",P).
 
-+!at(Ag, P) : at(Ag, P) <- 
-	.println("Owner is at ",P);
-	.wait(5000).
-+!at(Ag, P) : not at(Ag, P) <- 
-	.println("Going to ", P);
-	!go(P);                                        
-	.println("Checking if is at ", P);
-	!at(Ag, P).            
-	                                                   
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomAg) <-                             
-	.println("Al estar en la misma habitación se debe mover directamente a: ", P);
-	move_towards(P).  
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  connect(RoomAg, RoomP, Door) & atDoor <-
-	.println("Al estar en la puerta ", Door, " se dirige a ", P);                        
-	move_towards(P); 
-	!go(P).       
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  connect(RoomAg, RoomP, Door) & not atDoor <-
-	.println("Al estar en una habitación contigua se mueve hacia la puerta: ", Door);
-	move_towards(Door); 
-	!go(P).       
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  not connect(RoomAg, RoomP, _) & connect(RoomAg, Room, DoorR) &
-		  connect(Room, RoomP, DoorP) & not atDoor <-
-	.println("Se mueve a: ", DoorR, " para ir a la habitación contigua, ", Room);
-	move_towards(DoorR); 
-	!go(P). 
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  not connect(RoomAg, RoomP, _) & connect(RoomAg, Room, DoorR) &
-		  connect(Room, RoomP, DoorP) & atDoor <-
-	.println("Se mueve a: ", DoorP, " para ir a la habitación ", RoomP);
-	move_towards(DoorP); 
-	!go(P). 
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP <-
-	.println("Owner is at ", RoomAg,", that is not a contiguous room to ", RoomP);
-	move_towards(P).                                                          
--!go(P) <- .println("Something goes wrong......").
-	                                                                        
-	
-+!get(drug) : .my_name(Name) <- 
-   Time = math.ceil(math.random(4000));
-   .println("I am waiting ", Time, " ms. before asking the nurse robot for my medicine.");
-   .wait(Time);
-   .send(enfermera, achieve, has(Name, drug)).
++!go_at(owner,P)[source(self)] : not at(owner,P)
+<- 
+    move_towards(P);
+    !go_at(owner,P).
 
-+has(owner,drug) : true <-
-   .println("Owner take the drug.");
-   !take(drug).
--has(owner,drug) : true <-
-   .println("Owner ask for drug. It is time to take it.");
-   !get(drug).
-                                       
-// while I have drug, sip
-+!take(drug) : has(owner, drug) <-
-   sip(drug);
-   .println("Owner is siping the drug.");
-   !take(drug).
-+!take(drug) : not has(owner, drug) <-
-   .println("Owner has finished to take the drug.").//;
-   //-asked(drug).
+-!go_at(owner,P)[source(self)] 
+<- 
+    .send(robot,tell,aparta);
+    !go_at(owner,P).
 
-+!check_bored : true
-   <- .random(X); .wait(X*5000+2000);  // Owner get bored randomly
-      .send(enfermera, askOne, time(_), R); // when bored, owner ask the robot about the time
-      .print(R);
-	  .send(enfermera, tell, chat("What's the weather in Ourense?"));
-      !check_bored.
+// Cuando tiene la medicina en la mano, la consume.
++has(owner,A) : true 
+<- 
+    !consume(A).
 
-+msg(M)[source(Ag)] : .my_name(Name)
-   <- .print(Ag, " send ", Name, " the message: ", M);
-      -msg(M).
-
-	  
++!consume(A)[source(self)] : not .intend(consume(A))
+<- 
+    .print("Voy a tomar ",A);
+    consume(A);
+    .wait(2000);
+    .print("He tomado ",A).
