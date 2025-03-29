@@ -1,3 +1,4 @@
+package domotic;
 
 import java.util.ArrayList;
 
