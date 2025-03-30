@@ -146,8 +146,28 @@ public class HouseView extends GridWorldView {
 				drawImage(g, x, y, objPath);	
 				g.setColor(Color.blue);
 			}                      
-            drawString(g, x, y, defaultFont, "Fr ("+hmodel.medicamentosDisponible("Simvastatina")+")");
+            drawString(g, x, y, defaultFont, "PA (" + hmodel.getAvailableParacetamol() + ")" + "IB (" + hmodel.getAvailableIbuprofeno() + ")" + "LO (" + hmodel.getAvailableLorazepam() + ")");
+			drawString(g, x, y + 1, defaultFont, "AS (" + hmodel.getAvailableAspirina() + ")" + "AM (" + hmodel.getAvailableAmoxicilina() + ")");
+
             break; 
+
+			case HouseModel.CABINET:
+				g.setColor(Color.lightGray);
+				if (lRobot.isNeigbour(hmodel.lCabinet) || lOwner.isNeigbour(hmodel.lCabinet)) {
+					objPath = "doc/openCabinet.png";
+					drawImage(g, x, y, objPath);
+					g.setColor(Color.yellow);
+
+				} else {
+					objPath = "doc/closeCabinet.png";
+					drawImage(g, x, y, objPath);
+					g.setColor(Color.blue);
+				}
+				drawString(g, x, y, defaultFont, "PA (" + hmodel.getAvailableParacetamol() + ")" + "IB (" + hmodel.getAvailableIbuprofeno() + ")" + "LO (" + hmodel.getAvailableLorazepam() + ")");
+				drawString(g, x, y + 1, defaultFont, "AS (" + hmodel.getAvailableAspirina() + ")" + "AM (" + hmodel.getAvailableAmoxicilina() + ")");
+
+				
+				break;
 		}
         //repaint();
     }
@@ -162,7 +182,7 @@ public class HouseView extends GridWorldView {
 		if (id < 1) { 
 			if (!lRobot.equals(lOwner) && !lRobot.equals(hmodel.lFridge)) {
 				c = Color.yellow;
-				if (hmodel.carryingDrug) {//c = Color.orange;
+				if (hmodel.getCarryingDrugs()>0) {//c = Color.orange;
 					//super.drawAgent(g, x, y, c, -1);
 					objPath = "/doc/beerBot.png";//currentDirectory.concat("/doc/beerBot.png");
 					drawImage(g,x,y,objPath);
@@ -196,9 +216,6 @@ public class HouseView extends GridWorldView {
 			};
 			if (lRobot.isNeigbour(lOwner)) {	
 				String o = "S";
-				if (hmodel.sipCount > 0) {
-					o +=  " ("+hmodel.sipCount+")";
-				}
 				g.setColor(Color.yellow);
 				drawString(g, x, y, defaultFont, o);
 			}                                                           
