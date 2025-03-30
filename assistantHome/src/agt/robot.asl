@@ -1,52 +1,48 @@
-/* Initial beliefs and rules */
-
-connect(kitchen, hall, doorKit1).
-connect(kitchen, hallway, doorKit2).
-connect(hall, kitchen, doorKit1).
-connect(hallway, kitchen, doorKit2).
-connect(bath1, hallway, doorBath1).
-connect(bath2, bedroom1, doorBath2).
-connect(hallway, bath1, doorBath1).
-connect(bedroom1, bath2, doorBath2).
-connect(bedroom1, hallway, doorBed1).
-connect(hallway, bedroom1, doorBed1).
-connect(bedroom2, hallway, doorBed2).
-connect(hallway, bedroom2, doorBed2).
-connect(bedroom3, hallway, doorBed3).
-connect(hallway, bedroom3, doorBed3).
-connect(hall, livingroom, doorSal1).        
-connect(livingroom, hall, doorSal1).
-connect(hallway, livingroom, doorSal2).       
-connect(livingroom, hallway, doorSal2).     
+/* Initial beliefs and rules */  
 
 // initially, robot is free
 free.
 
-// initially, I believe that there is some drug in the fridge
-available(drug, fridge).
+cantidad(paracetamol,20).
+cantidad(ibuprofeno,20).
+cantidad(aspirina,20).
+cantidad(lorazepam,20).
+cantidad(amoxicilina,20).
 
-// my owner should not consume more than 10 drugs a day :-)
-limit(drug,10).  
-                 
-too_much(B, Ag) :-
-   .date(YY, MM, DD) &
-   .count(consumed(YY, MM, DD, _, _, _, B, Ag), QtdB) &   
-   limit(B, Limit) &    
-   .println(Ag," has consumed ", QtdB, " ", B, " their limit is: ", Limit) &
-   QtdB > Limit-1. 
-   
+//Owner le indica al robot la nueva pauta de medicinas.
++pautaNueva(M,H,F)[source(owner)]<-.abolish(pauta(M,_,_));+pauta(M,H,F);.abolish(pautaNueva(M,H,F)).
+
+!simulate_behaviour.   
+/* Plans */
+//La simulación del robot es bastante sencilla,se desplaza a 3 posiciones.
++!simulate_behaviour[source(self)] 
+   <- .random(X); .wait(3000*X + 5000); // wait for a random time
+    
+    .random([delivery,fridge,washer,cabinet],Y);
+    .print("Voy a un sitio ",Y);
+    !go_at(enfermera,Y);
+    !simulate_behaviour.
+
++!go_at(enfermera,P)[source(self)] : at(enfermera,P) <- .print("He llegado a ",P).
++!go_at(enfermera,P)[source(self)] : not at(enfermera,P) 
+  <- move_towards(P);
+     !go_at(enfermera,P).
+-!go_at(enfermera,P)[source(self)]<- .print("Estoy apartando");apartar;.wait(5);!go_at(enfermera,P).
+
+
+
 answer(Request, "It will be nice to check the weather forecast, don't?.") :-
 	.substring("tiempo", Request).  
 	
 answer(Request, "I don't understand what are you talking about.").
 
-bringDrug(Ag) :- available(drug, fridge) & not too_much(drug, Ag).
+bringDrug(Ag) :- cantidad(D, not L == 0).
 
-orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).  
+orderDrug(Ag) :-cantidad(D, L == 0 ).  
 
 /* Plans */
 
-+!has(Ag, drug)[source(Ag)] : 
++!has(Ag, paracetamol)[source(Ag)] : 
 	bringDrug(Ag) & free[source(self)] <- 
 		.println("FIRST RULE ====================================");
 		.wait(1000);
@@ -55,31 +51,31 @@ orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).
 		!at(enfermera, fridge);
 		
 		open(fridge); // Change it by an internal operation similar to fridge.open
-		get(drug);    // Change it by a set of internal operations that recognize the drug an take it
+		get(paracetamol);    // Change it by a set of internal operations that recognize the drug an take it
 		              // maybe it need to take other products and change their place in the fridge
 		close(fridge);// Change it by an internal operation similar to fridge.close
 		!at(enfermera, Ag);
-		hand_in(drug);// In this case this operation could be external or internal their intention
+		hand_in(paracetamol);// In this case this operation could be external or internal their intention
 		              // is to inform that the owner has the drug in his hand and could begin to drink
-		?has(Ag, drug);  // If the previous action is completed then a perception from environment must update
+		?has(Ag, paracetamol);  // If the previous action is completed then a perception from environment must update
 		                 // the beliefs of the robot
 						 
 		// remember that another drug has been consumed
 		.date(YY, MM, DD); .time(HH, NN, SS);
-		+consumed(YY, MM, DD, HH, NN, SS, drug, Ag);
+		+consumed(YY, MM, DD, HH, NN, SS, paracetamol, Ag);
 		+free[source(self)].  
 
 // This rule was changed in order to find the deliver in a different location 
 // The door could be a good place to get the order and then go to the fridge
 // and when the drug is there update the beliefs
 
-+!has(Ag, drug)[source(Ag)] :
++!has(Ag, L)[source(Ag)] :
    	orderDrug(Ag) & free[source(self)] <- 
 		.println("SECOND RULE ====================================");
 		.wait(1000);
    		-free[source(self)]; 
 		!at(enfermera, fridge);
-		.send(repartidor, achieve, order(drug, 5)); 
+		.send(repartidor, achieve, order(D, 5)); 
 		!at(enfermera, delivery);     // go to deliver area and wait there.
 		.wait(delivered);
 		!at(enfermera, fridge);       // go to fridge 
@@ -128,45 +124,7 @@ orderDrug(Ag) :- not available(drug, fridge) & not too_much(drug, Ag).
 	.wait(200);
 	!go(P);                                        
 	.println("Checking if is at ", P, " ============>");
-	!at(Ag, P).            
-	                                                   
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomAg) <- 
-	.println("<================== 1 =====================>");
-	.println("Al estar en la misma habitación se debe mover directamente a: ", P);
-	move_towards(P).  
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  connect(RoomAg, RoomP, Door) & not atDoor <-
-	.println("<================== 3 =====================>");
-	.println("Al estar en una habitación contigua se mueve hacia la puerta: ", Door);
-	move_towards(Door); 
-	!go(P).                     
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  connect(RoomAg, RoomP, Door) <- //& not atDoor <-
-	.println("<================== 3 =====================>");
-	.println("Al estar en la puerta de la habitación contigua se mueve hacia ", P);
-	move_towards(P); 
-	!go(P).       
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  not connect(RoomAg, RoomP, _) & connect(RoomAg, Room, DoorR) &
-		  connect(Room, RoomP, DoorP) & not atDoor <-
-	.println("<================== 4 =====================>");
-	.println("Se mueve a: ", DoorR, " para ir a la habitación contigua, ", Room);
-	move_towards(DoorR); 
-	!go(P). 
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  not connect(RoomAg, RoomP, _) & connect(RoomAg, Room, DoorR) &
-		  connect(Room, RoomP, DoorP) & atDoor <-
-	.println("<================== 4 BIS =====================>");
-	.println("Se mueve a: ", DoorP, " para acceder a la habitación ", RoomP);
-	move_towards(DoorP); 
-	!go(P). 
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP <- //& not atDoor <-
-	.println("Owner is at ", RoomAg,", that is not a contiguous room to ", RoomP);
-	.println("<================== 5 =====================>");
-	move_towards(P).                                                          
--!go(P) <- 
-	.println("¿¿¿¿¿¿¿¿¿¿¿¿¿¿¿ WHAT A FUCK !!!!!!!!!!!!!!!!!!!!");
-	.println("..........SOMETHING GOES WRONG......").                                        
+	!at(Ag, P).                                                    
 	                                                                        
 // when the supermarket makes a delivery, try the 'has' goal again
 +delivered(drug, _Qtd, _OrderId)[source(repartidor)]

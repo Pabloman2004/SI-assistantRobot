@@ -14,15 +14,14 @@
 // Owner will dialog with the nurse robot 
 // Owner will move randomly in the house by selecting places
 
-!sit.
 
-!open.
+
 
 !walk.
 
 !wakeup.
 
-!check_bored.
+
 
 pauta(paracetamol,8,6).
 pauta(ibuprofeno,12,6).
@@ -51,11 +50,65 @@ pauta(amoxicilina,15,2).
 					.abolish(pauta(M,H,F));
 					.print("Nueva pauta:[",M,",",X,",",F,"]");
 					+pauta(M,X,F);
-					.send(robot,tell,pautaNueva(M,X,F));
+					.send(enfermera,tell,pautaNueva(M,X,F));
 				}
 			}
 		}.
 
++!simulate_behaviour[source(self)] 
+   <- .random(X); .wait(3000*X + 5000); // wait for a random time
+    if(X < 0.5){
+    .random([delivery,fridge,washer,cabinet],Y);
+    .print("Voy a un sitio ",Y);
+    !go_at(owner,Y);
+    }
+    elif(X < 0.7){
+    .random([chair1,chair2,chair3,chair4,sofa],Y);
+    .print("Voy a sentarme en",Y);
+    !go_at(owner,Y);
+    //sit(Y);
+    .print("Me siento");
+    }else{
+    .random([bed1,bed2,bed3],Y);
+    .print("Voy a echarme una siesta en");
+    !go_at(owner,Y);
+    .print("Me acuesto");
+    }
+    !simulate_behaviour.
+
++!go_at(owner,P)[source(self)] : at(owner,P) <- .print("He llegado a ",P).
++!go_at(owner,P)[source(self)] : not at(owner,P)
+  <- move_towards(P);
+     !go_at(owner,P).
+-!go_at(owner,P)[source(self)]
+<- .send(enfermera,tell,aparta);
+   !go_at(owner,P).
+
++!tomarMedicina(L)[source(self)]<-
+   if(.intend(simulate_behaviour)){
+      .drop_intention(simulate_behaviour);
+   }
+   !tomar(owner,L);
+   !simulate_behaviour.
+
++!tomar(owner,L)[source(self)]
+   <- !go_at(owner,cabinet);
+      if(not at(enfermera,cabinet) & not quieto){
+         open(cabinet);
+		 .send(robot,achieve,comprueba(L));
+         for(.member(pauta(M,H,F),L))
+         {
+            .abolish(pauta(M,H,F));
+      	   takeDrug(owner,M);
+            .print("He cogido la medicina", M);
+            .send(enfermera, tell, comprobarConsumo(M));
+         };
+         for(.member(pauta(M,H,F),L))
+         {
+            handDrug(M);
+         }
+         close(cabinet);
+      }.
 // Initially Owner could be: sit, opening the door, waking up, walking, ...
 //!sit.   			
 //!check_bored. 
@@ -64,12 +117,12 @@ pauta(amoxicilina,15,2).
 
 +!wakeup : .my_name(Ag) & not busy <-
 	+busy;
-	!check_bored;
-	.println("Owner just woke up and needs to go to the fridge"); 
+	.println("Me he despertado jujuju");
+    !simulate_behaviour;
 	.wait(3000);
-	-busy;
-	!sit.
-+!wakeup : .my_name(Ag) & busy <-
+	-busy.
+	
++!wakeup : .my_name(Ag) <-
 	.println("Owner is doing something now, is not asleep");
 	.wait(10000);
 	!wakeup.
@@ -81,63 +134,16 @@ pauta(amoxicilina,15,2).
 	!at(Ag,sofa);
 	.wait(2000);
 	//.println("Owner is walking at home"); 
-	-busy;
-	!open.
+	-busy.
+	
 +!walk : .my_name(Ag) & busy <-
 	.println("Owner is doing something now and could not walk");
 	.wait(6000);
 	!walk.
 
-+!open : .my_name(Ag) & not busy <-
-	+busy;   
-	.println("Owner goes to the home door");
-	.wait(200);
-	!at(Ag, delivery);
-	.println("Owner is opening the door"); 
-	.random(X); .wait(X*7351+2000); // Owner takes a random amount of time to open the door 
-	!at(Ag, sofa);
-	sit(sofa);
-	.wait(5000);
-	!at(Ag, fridge);
-	.wait(10000);
-	!at(Ag, chair3);
-	sit(chair3);
-	-busy.
-+!open : .my_name(Ag) & busy <-
-	.println("Owner is doing something now and could not open the door");
-	.wait(8000);
-	!open.
+
  
-+!sit : .my_name(Ag) & not busy <- 
-	+busy; 
-	.println("Owner goes to the fridge to get a beer.");
-	.wait(1000);
-	!at(Ag, fridge);
-	.println("Owner is hungry and is at the fridge getting something"); 
-	//.println("He llegado al frigorifico");
-	.wait(2000);
-	!at(Ag, chair3);
-	sit(chair3);
-	.wait(4000);
-	!at(Ag, chair4);
-	sit(chair4);
-	.wait(4000);
-	!at(Ag, chair2);
-	sit(chair2);
-	.wait(4000);
-	!at(Ag, chair1);
-	sit(chair1);
-	.wait(4000);
-	!at(Ag, sofa);
-	sit(sofa);
-	.wait(10000);
-	!get(drug); 
-	.wait(50000);
-	-busy.
-+!sit : .my_name(Ag) & busy <-
-	.println("Owner is doing something now and could not go to fridge");
-	.wait(30000);
-	!sit.
+
 
 +!at(Ag, P) : at(Ag, P) <- 
 	.println("Owner is at ",P);
@@ -200,13 +206,6 @@ pauta(amoxicilina,15,2).
 +!take(drug) : not has(owner, drug) <-
    .println("Owner has finished to take the drug.").//;
    //-asked(drug).
-
-+!check_bored : true
-   <- .random(X); .wait(X*5000+2000);  // Owner get bored randomly
-      .send(enfermera, askOne, time(_), R); // when bored, owner ask the robot about the time
-      .print(R);
-	  .send(enfermera, tell, chat("What's the weather in Ourense?"));
-      !check_bored.
 
 +msg(M)[source(Ag)] : .my_name(Name)
    <- .print(Ag, " send ", Name, " the message: ", M);
