@@ -21,7 +21,7 @@ public class HouseModel extends GridWorldModel {
 	public static final int CHARGER = 256;
 	public static final int TABLE = 512;
 	public static final int BED = 1024;
-	public static final int WALLV = 2048;
+	public static final int DELIVER = 2048;
 	public static final int CABINET = 4096;
 
 	// the grid size
@@ -139,8 +139,8 @@ public class HouseModel extends GridWorldModel {
 		// ag code 0 means the robot
 
 		// Deberia haber una estacion de carga del robot, es esta?
-		setAgPos(0, 19, 10);
-		setAgPos(1, 23, 8);
+		setAgPos(0, 8, 1);
+		setAgPos(1, 5, 9);
 		// setAgPos(2, GSize*2-1, GSize*3/5);
 
 		// Do a new method to create literals for each object placed on
@@ -232,7 +232,44 @@ public class HouseModel extends GridWorldModel {
 	}
 
 	// tienen getRoomCenter no se porque
+	Location getRoomCenter(String thing)
+	{
+		Location toret = kitchen.center();
 
+		if (thing.equals("bath1")) {
+			 toret =bath1.center();
+		}
+		;
+		if (thing.equals("bath2")) {
+			toret = bath2.center();
+		}
+		;
+		if (thing.equals("bedroom1")) {
+			 toret =bedroom1.center();
+		}
+		;
+		if (thing.equals("bedroom2")) {
+			toret =bedroom2.center();
+		}
+		;
+		if (thing.equals("bedroom3")) {
+			toret =bedroom3.center();    
+		}
+		;
+		if (thing.equals("hallway")) {
+			toret =hallway.center();
+		}
+		;
+		if (thing.equals("livingroom")) {
+			toret =livingroom.center();
+		}
+		;
+		if (thing.equals("hall")) {
+			toret =hall.center();
+		}
+		;
+		return toret;
+	}
 	boolean sit(int Ag, Location dest) {
 		Location loc = getAgPos(Ag);
 		if (loc.isNeigbour(dest)) {
@@ -288,7 +325,7 @@ public class HouseModel extends GridWorldModel {
 			return (isFree(x, y) && !hasObject(WASHER, x, y) && !hasObject(TABLE, x, y) && !hasObject(BED, x, y) &&
 					!hasObject(SOFA, x, y) && !hasObject(CABINET, x, y) && !hasObject(CHAIR, x, y) && !hasObject(FRIDGE, x, y));
 		} else { // este agente es el paciente
-			return (isFree(x, y) && !hasObject(WASHER, x, y) && !hasObject(CABINET, x, y) && !hasObject(TABLE, x, y) && !hasObject(FRIDGE, x, y));
+			return (isFree(x, y) && !hasObject(WASHER, x, y) && !hasObject(CABINET, x, y) && !hasObject(TABLE, x, y) && !hasObject(FRIDGE, x, y) && !hasObject(DELIVER, x, y));
 		}
 	}
 
@@ -318,6 +355,9 @@ public class HouseModel extends GridWorldModel {
 
 		AStar path = new AStar(this, Ag, getAgPos(Ag), dest);
 		Location nextMove = path.getNextMove();
+		if (nextMove == null) {
+			System.out.println("No se encontró un camino válido para " + Ag + " hacia " + dest);
+		}
 		if (nextMove != null) {
 			calculateOwnerDir(Ag, nextMove);
 			setAgPos(Ag, nextMove);
@@ -476,6 +516,10 @@ public class HouseModel extends GridWorldModel {
 		}
 	}
 
+	public boolean comprobarConsumo(String drug, int num){
+		return getAvailableDrug(drug) == num - 1;
+	}
+
 	public Location getLocation(String loc) {
 		Location dest = null;
 		switch (loc) {
@@ -553,6 +597,52 @@ public class HouseModel extends GridWorldModel {
 				break;
 		}
 		return dest;
+	}
+
+	public boolean deliver(String drug, int qtd) {
+		switch (drug) {
+			case "paracetamol":
+				deliveredParacetamol += qtd;
+				break;
+			case "ibuprofeno":
+				deliveredIbuprofeno += qtd;
+				break;
+			case "lorazepam":
+				deliveredLorazepam += qtd;
+				break;
+			case "aspirina":
+				deliveredAspirina += qtd;
+				break;
+			case "amoxicilina":
+				deliveredAmoxicilina += qtd;
+				break;
+			default:
+				break;
+		}
+		return true;
+	}
+
+	public boolean getDelivery(String drug) {
+		switch (drug) {
+			case "paracetamol":
+				deliveredParacetamol = 0;
+				break;
+			case "ibuprofeno":
+				deliveredIbuprofeno = 0;
+				break;
+			case "lorazepam":
+				deliveredLorazepam = 0;
+				break;
+			case "aspirina":
+				deliveredAspirina = 0;
+				break;
+			case "amoxicilina":
+				deliveredAmoxicilina = 0;
+				break;
+			default:
+				break;
+		}
+		return true;
 	}
 
 }
