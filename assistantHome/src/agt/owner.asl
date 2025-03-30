@@ -9,7 +9,7 @@ pauta(aspirina,8,8).
 pauta(amoxicilina,15,2).
 
 // El robot controla los horarios y actualiza las pautas tras una consumición.
-+pauta(M,H,F)[source(robot)] <- 
++pauta(M,H,F)[source(enfermera)] <- 
     .abolish(pauta(M,H-F,_)).
 
 // Enviamos al owner las pautas iniciales.
@@ -60,7 +60,7 @@ pauta(amoxicilina,15,2).
     !simulate_behaviour.
 
 // Si es hora de la pauta, el owner puede decidir ir por la medicina.
-+hour(H) 
++hour(H) : dia
 <- 
     .random(X);
     if (X < 0.9) {
@@ -86,20 +86,20 @@ pauta(amoxicilina,15,2).
 // Va al cabinet, toma la medicina e informa al robot.
 +!tomar(owner,L)[source(self)] 
 <- 
-    !go_at(owner,cabinet);
-    if (not at(robot,cabinet) & not quieto) {
-        open(cabinet);
+    !go_at(owner,fridge);
+    if (not at(enfermera,fridge) & not quieto) {
+        open(fridge);
         .send(robot,achieve,comprueba(L));
         for (.member(pauta(M,H,F),L)) {
             .abolish(pauta(M,H,F));
             takeDrug(owner,M);
             .print("He cogido la medicina ",M);
-            .send(robot,tell,comprobarConsumo(M));
+            .send(enfermera,tell,comprobarConsumo(M));
         };
         for (.member(pauta(M,H,F),L)) {
             handDrug(M);
         };
-        close(cabinet);
+        close(fridge);
     }.
 
 // Si el robot se adelanta, el owner espera.
@@ -125,7 +125,7 @@ pauta(amoxicilina,15,2).
 
 -!go_at(owner,P)[source(self)] 
 <- 
-    .send(robot,tell,aparta);
+    .send(enfermera,tell,aparta);
     !go_at(owner,P).
 
 // Cuando tiene la medicina en la mano, la consume.

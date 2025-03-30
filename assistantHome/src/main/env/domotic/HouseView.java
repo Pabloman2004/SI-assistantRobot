@@ -154,12 +154,12 @@ public class HouseView extends GridWorldView {
 			case HouseModel.CABINET:
 				g.setColor(Color.lightGray);
 				if (lRobot.isNeigbour(hmodel.lCabinet) || lOwner.isNeigbour(hmodel.lCabinet)) {
-					objPath = "doc/openCabinet.png";
+					objPath = "/doc/openCabinet.png";
 					drawImage(g, x, y, objPath);
 					g.setColor(Color.yellow);
 
 				} else {
-					objPath = "doc/closeCabinet.png";
+					objPath = "/doc/closeCabinet.png";
 					drawImage(g, x, y, objPath);
 					g.setColor(Color.blue);
 				}
