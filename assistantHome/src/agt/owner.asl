@@ -43,7 +43,7 @@ pauta(amoxicilina,15,2).
     .random(X); 
     .wait(3000*X + 5000); // Espera un tiempo aleatorio
     if (X < 0.5) {
-        .random([delivery,fridge,washer,retrete],Y);
+        .random([delivery,fridge,washer],Y);
         .print("Voy a un sitio ",Y);
         !go_at(owner,Y);
     } elif (X < 0.7) {
@@ -101,7 +101,13 @@ pauta(amoxicilina,15,2).
         };
         close(fridge);
     }.
-
++espera <- 
+	if(.intend(simulate_behaviour))
+	{
+		.drop_intention(simulate_behaviour);
+		!simulate_behaviour;
+	};
+	.abolish(espera).
 // Si el robot se adelanta, el owner espera.
 +quieto 
 <- 
