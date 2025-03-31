@@ -53,6 +53,7 @@ public class HouseEnv extends Environment {
 	// public static final Literal oac = Literal.parseLiteral("at(owner,cabinet)");
 
 	static Logger logger = Logger.getLogger(HouseEnv.class.getName());
+	private static Calendar calendar;
 
 	HouseModel model; // the model of the grid
 	/*
@@ -68,7 +69,7 @@ public class HouseEnv extends Environment {
 	@Override
 	public void init(String[] args) {
 		model = new HouseModel();
-
+		calendar = new Calendar();
 		if (args.length == 1 && args[0].equals("gui")) {
 			HouseView view = new HouseView(model);
 			model.setView(view);
@@ -76,64 +77,6 @@ public class HouseEnv extends Environment {
 
 		updatePercepts();
 	}
-	/*
-	 * METODO VIEJO
-	 * 
-	 * void updateAgentsPlace() {
-	 * // get the robot location
-	 * Location lRobot = model.getAgPos(0);
-	 * // get the robot room location
-	 * String RobotPlace = model.getRoom(lRobot);
-	 * addPercept("enfermera",
-	 * Literal.parseLiteral("atRoom("+RobotPlace+")"));//añade a las creencias del
-	 * agente enfermera la localización de la habitación en la que se encuentra
-	 * addPercept("owner",
-	 * Literal.parseLiteral("atRoom(enfermera,"+RobotPlace+")"));//añade a las
-	 * creencias del agente owner la localización de la habitación en la que se
-	 * encuentra el agente enfermera
-	 * // get the owner location
-	 * Location lOwner = model.getAgPos(1);
-	 * // get the owner room location
-	 * String OwnerPlace = model.getRoom(lOwner);
-	 * addPercept("owner", Literal.parseLiteral("atRoom("+OwnerPlace+")"));//añade a
-	 * las creencias del agente owner la localización de la habitación en la que se
-	 * encuentra el mismmo
-	 * addPercept("enfermera",
-	 * Literal.parseLiteral("atRoom(owner,"+OwnerPlace+")"));//añade a las creencias
-	 * del agente enfermera la localización de la habitación en la que se encuentra
-	 * el agente owner
-	 * 
-	 * if (lRobot.distance(model.lDoorHome)==0 ||
-	 * lRobot.distance(model.lDoorKit1)==0 ||
-	 * lRobot.distance(model.lDoorKit2)==0 ||
-	 * lRobot.distance(model.lDoorSal1)==0 ||
-	 * lRobot.distance(model.lDoorSal2)==0 ||
-	 * lRobot.distance(model.lDoorBath1)==0 ||
-	 * lRobot.distance(model.lDoorBath2)==0 ||
-	 * lRobot.distance(model.lDoorBed1)==0 ||
-	 * lRobot.distance(model.lDoorBed2)==0 ||
-	 * lRobot.distance(model.lDoorBed3)==0 ) {
-	 * addPercept("enfermera", Literal.parseLiteral("atDoor"));//creo que lo que
-	 * quiere decir es que si enfrente tiene un obstaculo le pasa la creencia de que
-	 * esta enfrente de un obstaculo lo que no se porque le pasa atDoor
-	 * //Creo que pasa el atDoor para verificar si tiene puertas cerca
-	 * };
-	 * 
-	 * if (lOwner.distance(model.lDoorHome)==0 ||
-	 * lOwner.distance(model.lDoorKit1)==0 ||
-	 * lOwner.distance(model.lDoorKit2)==0 ||
-	 * lOwner.distance(model.lDoorSal1)==0 ||
-	 * lOwner.distance(model.lDoorSal2)==0 ||
-	 * lOwner.distance(model.lDoorBath1)==0 ||
-	 * lOwner.distance(model.lDoorBath2)==0 ||
-	 * lOwner.distance(model.lDoorBed1)==0 ||
-	 * lOwner.distance(model.lDoorBed2)==0 ||
-	 * lOwner.distance(model.lDoorBed3)==0 ) {
-	 * addPercept("owner", Literal.parseLiteral("atDoor"));//lo mismo para owner
-	 * };
-	 * 
-	 * }
-	 */
 
 	void updateAgentsPlace() {
 		// get the robot location
@@ -257,6 +200,10 @@ public class HouseEnv extends Environment {
 		if (lOwner.distance(model.lSofa) == 0) {
 			addPercept("owner", oasf);
 			// System.out.println("[owner] is at Sofa.");
+		}
+
+		for (int i = 0; i < ARRAYAG.length; i++) {
+			addPercept(ARRAYAG[i], Literal.parseLiteral("hour(" + calendar.getHora() + ")"));
 		}
 
 		for (int i = 0; i < model.getOwnerDrugs().size(); i++) {

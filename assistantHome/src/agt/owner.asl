@@ -33,7 +33,7 @@ pauta(amoxicilina,15,2).
    <- .findall(pauta(A,B,C),.belief(pauta(A,B,C)),L);
    	  for(.member(I,L))
 	  {
-		.print("entro aqui");
+		.print(L);
 	  	.send(enfermera,tell,I);
 	  }.
 //Owner cambia las pautas,para ello utiliza n�meros aleatorios e informa al robot.
