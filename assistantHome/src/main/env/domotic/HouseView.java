@@ -146,9 +146,6 @@ public class HouseView extends GridWorldView {
 				drawImage(g, x, y, objPath);	
 				g.setColor(Color.blue);
 			}                      
-            drawString(g, x, y, defaultFont, "PA (" + hmodel.getAvailableParacetamol() + ")" + "IB (" + hmodel.getAvailableIbuprofeno() + ")" + "LO (" + hmodel.getAvailableLorazepam() + ")");
-			drawString(g, x, y + 1, defaultFont, "AS (" + hmodel.getAvailableAspirina() + ")" + "AM (" + hmodel.getAvailableAmoxicilina() + ")");
-
             break; 
 
 			case HouseModel.CABINET:
@@ -365,8 +362,6 @@ public class HouseView extends GridWorldView {
         g.drawRect(x * cellSizeW + 1, y * cellSizeH + 1, cellSizeW - 3, cellSizeH - 3);   
     }  
 	
-	public void cerrarPuerta(){
 
-	}
 	
 }

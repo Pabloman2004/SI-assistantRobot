@@ -81,6 +81,9 @@ cantidad(amoxicilina,20).
 		 .send(owner,tell,espera);
          for(.member(pauta(M,H,F),L))
          {
+         !go_at(enfermera,cabinet);
+         .print("Cogiendo ", M);
+         !go_at(enfermera,owner);
 		 	.print("Le he dado ", M);
             handDrug(M);
 			!resetearPauta(M);
@@ -111,6 +114,13 @@ cantidad(amoxicilina,20).
 		 
 @comprueba[atomic]
 
++!comprueba(L)<-
+		 .findall(M,.belief(comprobarConsumo(M)),X);
+         for(.member(M,X)){
+		 	.print("Compruebo el consumo de ",M);
+            !comprobarConsumo(M)
+		 }.
+		 
 +!comprobarConsumo(M)[source(self)] : cantidad(M,H) <- 
    open(cabinet);
 	!comprobar(M,H);
@@ -122,45 +132,14 @@ cantidad(amoxicilina,20).
 	.print("Es verdad que ha cogido ",M);
 	!reducirCantidad(M);
    !resetearPauta(M).
-   
+
 //Robot se da cuenta que el owner no ha tomado la medicina,(no trataremos que el owner lo mienta).
 -!comprobar(M,H)[source(self)]  <-
 	.print("No ha cogido",M,"!");
 	close(cabinet).
 
-answer(Request, "It will be nice to check the weather forecast, don't?.") :-
-	.substring("tiempo", Request).  
-	
-answer(Request, "I don't understand what are you talking about.").
 
-bringDrug(Ag) :- cantidad(D, not L == 0).
-
-orderDrug(Ag) :-cantidad(D, L == 0 ).  
-
-
-
-+!has(Ag, paracetamol)[source(Ag)] : 
-	bringDrug(Ag) & free[source(self)] <- 
-		.println("FIRST RULE ====================================");
-		.wait(1000);
-		//!at(enfermera, owner); 
-    	-free[source(self)];      
-		!at(enfermera, fridge);
-		
-		open(fridge); // Change it by an internal operation similar to fridge.open
-		get(paracetamol);    // Change it by a set of internal operations that recognize the drug an take it
-		              // maybe it need to take other products and change their place in the fridge
-		close(fridge);// Change it by an internal operation similar to fridge.close
-		!at(enfermera, Ag);
-		hand_in(paracetamol);// In this case this operation could be external or internal their intention
-		              // is to inform that the owner has the drug in his hand and could begin to drink
-		?has(Ag, paracetamol);  // If the previous action is completed then a perception from environment must update
-		                 // the beliefs of the robot
-						 
-		// remember that another drug has been consumed
-		.date(YY, MM, DD); .time(HH, NN, SS);
-		+consumed(YY, MM, DD, HH, NN, SS, paracetamol, Ag);
-		+free[source(self)].  
++aparta[source(owner)] <- .print("Debo de apartarme");-aparta.
 
 
 +delivered(drug, _Qtd, _OrderId)[source(repartidor)]

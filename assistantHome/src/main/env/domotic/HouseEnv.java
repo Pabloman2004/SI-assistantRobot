@@ -215,7 +215,7 @@ public class HouseEnv extends Environment {
 	@Override
 	public boolean executeAction(String ag, Structure action) {
 
-		System.out.println("[" + ag + "] doing: " + action);
+		//System.out.println("[" + ag + "] doing: " + action);
 		int agNum = -1;
 		int it = -1;
 		while (++it < ARRAYAG.length && agNum == -1) {

@@ -10,7 +10,7 @@ public class Calendar {
         new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(3000); // Espera X milisegundos
+                    Thread.sleep(15000); // Espera X milisegundos
                     increaseHour(); // Incrementa la hora
                 } catch (InterruptedException e) {
                     e.printStackTrace();

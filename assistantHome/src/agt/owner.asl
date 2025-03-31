@@ -33,7 +33,6 @@ pauta(amoxicilina,15,2).
    <- .findall(pauta(A,B,C),.belief(pauta(A,B,C)),L);
    	  for(.member(I,L))
 	  {
-		.print(L);
 	  	.send(enfermera,tell,I);
 	  }.
 //Owner cambia las pautas,para ello utiliza n�meros aleatorios e informa al robot.
@@ -61,7 +60,6 @@ pauta(amoxicilina,15,2).
     .random([delivery,fridge,washer,cabinet],Y);
     .print("Voy a un sitio ",Y);
     !go_at(owner,Y);
-	+hour(H);
     }
     elif(X < 0.7){
     .random([chair1,chair2,chair3,chair4,sofa],Y);
@@ -77,17 +75,21 @@ pauta(amoxicilina,15,2).
     }
     !simulate_behaviour.
 
-+hour(H) : dia<-
++hour(H) <-
    .random(X);
-   if(X < 0.9){
-   	  .print("Voy a por medicinas");
+
+   if(X < 0.6){   	  
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
       if(not L == []){
       if(not .intend(tomarMedicina(L)) & not quieto){
+		 .print("Voy a por medicinas");
          .print(L);
          !tomarMedicina(L);
       }
      }
+	 else{
+		.print("No es hora de la medicina");
+	 }
    }.
 
 +!go_at(owner,P)[source(self)] : at(owner,P) <- .print("He llegado a ",P).
@@ -102,18 +104,18 @@ pauta(amoxicilina,15,2).
    if(.intend(simulate_behaviour)){
       .drop_intention(simulate_behaviour);
    }
-   !tomar(owner,L);
-   !simulate_behaviour.
+   !tomar(owner,L).
+   
 
 +!tomar(owner,L)[source(self)]
    <- !go_at(owner,cabinet);
       if(not at(enfermera,cabinet) & not quieto){
          open(cabinet);
-		 .send(robot,achieve,comprueba(L));
+		 .send(enfermera,achieve,comprueba(L));
          for(.member(pauta(M,H,F),L))
          {
             .abolish(pauta(M,H,F));
-      	   takeDrug(owner,M);
+    		takeDrug(owner,M);
             .print("He cogido la medicina", M);
             .send(enfermera, tell, comprobarConsumo(M));
          };
@@ -122,6 +124,7 @@ pauta(amoxicilina,15,2).
             handDrug(M);
          }
          close(cabinet);
+		 !simulate_behaviour
       }.
 // Initially Owner could be: sit, opening the door, waking up, walking, ...
 //!sit.   			
@@ -154,25 +157,4 @@ pauta(amoxicilina,15,2).
    .wait(2000);
    .print("He tomado ",A).	                                                                        
 	
-+!get(drug) : .my_name(Name) <- 
-   Time = math.ceil(math.random(4000));
-   .println("I am waiting ", Time, " ms. before asking the nurse robot for my medicine.");
-   .wait(Time);
-   .send(enfermera, achieve, has(Name, drug)).
-
-+has(owner,drug) : true <-
-   .println("Owner take the drug.");
-   !take(drug).
--has(owner,drug) : true <-
-   .println("Owner ask for drug. It is time to take it.");
-   !get(drug).
-                                       
-// while I have drug, sip
-+!take(drug) : has(owner, drug) <-
-   sip(drug);
-   .println("Owner is siping the drug.");
-   !take(drug).
-+!take(drug) : not has(owner, drug) <-
-   .println("Owner has finished to take the drug.").//;
-   //-asked(drug).
 
