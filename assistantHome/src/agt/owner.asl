@@ -17,11 +17,9 @@
 
 
 
-!walk.
 
-!wakeup.
-
-
+!pauta_medicamentos.
+!simulate_behaviour.
 
 pauta(paracetamol,8,6).
 pauta(ibuprofeno,12,6).
@@ -29,12 +27,14 @@ pauta(lorazepam,22,23).
 pauta(aspirina,8,8).
 pauta(amoxicilina,15,2).
 
+
 +pauta(M,H,F)[source(robot)] <- .abolish(pauta(M,H-F,_)).
 +!pauta_medicamentos 
    <- .findall(pauta(A,B,C),.belief(pauta(A,B,C)),L);
    	  for(.member(I,L))
 	  {
-	  	.send(robot,tell,I);
+		.print("entro aqui");
+	  	.send(enfermera,tell,I);
 	  }.
 //Owner cambia las pautas,para ello utiliza n�meros aleatorios e informa al robot.
 +!cambiarPauta(T)
@@ -61,6 +61,7 @@ pauta(amoxicilina,15,2).
     .random([delivery,fridge,washer,cabinet],Y);
     .print("Voy a un sitio ",Y);
     !go_at(owner,Y);
+	+hour(H);
     }
     elif(X < 0.7){
     .random([chair1,chair2,chair3,chair4,sofa],Y);
@@ -75,6 +76,19 @@ pauta(amoxicilina,15,2).
     .print("Me acuesto");
     }
     !simulate_behaviour.
+
++hour(H) : dia<-
+   .random(X);
+   if(X < 0.9){
+   	  .print("Voy a por medicinas");
+      .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+      if(not L == []){
+      if(not .intend(tomarMedicina(L)) & not quieto){
+         .print(L);
+         !tomarMedicina(L);
+      }
+     }
+   }.
 
 +!go_at(owner,P)[source(self)] : at(owner,P) <- .print("He llegado a ",P).
 +!go_at(owner,P)[source(self)] : not at(owner,P)
@@ -115,75 +129,30 @@ pauta(amoxicilina,15,2).
 
 //+!init <- !sit ||| !open ||| !walk ||| !wakeup ||| !check_bored.
 
-+!wakeup : .my_name(Ag) & not busy <-
-	+busy;
-	.println("Me he despertado jujuju");
-    !simulate_behaviour;
-	.wait(3000);
-	-busy.
-	
-+!wakeup : .my_name(Ag) <-
-	.println("Owner is doing something now, is not asleep");
-	.wait(10000);
-	!wakeup.
-	
-+!walk : .my_name(Ag) & not busy <- 
-	+busy;  
-	.println("Owner is not busy, is sit down on the sofa");
-	.wait(500);
-	!at(Ag,sofa);
-	.wait(2000);
-	//.println("Owner is walking at home"); 
-	-busy.
-	
-+!walk : .my_name(Ag) & busy <-
-	.println("Owner is doing something now and could not walk");
-	.wait(6000);
-	!walk.
 
++espera :not durmiendo<- 
+	if(.intend(simulate_behaviour))
+	{
+		.drop_intention(simulate_behaviour);
+		!simulate_behaviour;
+	};
+	.abolish(espera). 
 
- 
++quieto
+	<- .print("Espero por mis medicinas");
+		if(.intend(tomarMedicina(_))){
+			.drop_intention(tomarMedicina(_));
+		}
+		if(not .intend(simulate_behaviour) & not durmiendo){
+			!simulate_behaviour;
+		}.
 
-
-+!at(Ag, P) : at(Ag, P) <- 
-	.println("Owner is at ",P);
-	.wait(5000).
-+!at(Ag, P) : not at(Ag, P) <- 
-	.println("Going to ", P);
-	!go(P);                                        
-	.println("Checking if is at ", P);
-	!at(Ag, P).            
-	                                                   
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomAg) <-                             
-	.println("Al estar en la misma habitación se debe mover directamente a: ", P);
-	move_towards(P).  
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  connect(RoomAg, RoomP, Door) & atDoor <-
-	.println("Al estar en la puerta ", Door, " se dirige a ", P);                        
-	move_towards(P); 
-	!go(P).       
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  connect(RoomAg, RoomP, Door) & not atDoor <-
-	.println("Al estar en una habitación contigua se mueve hacia la puerta: ", Door);
-	move_towards(Door); 
-	!go(P).       
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  not connect(RoomAg, RoomP, _) & connect(RoomAg, Room, DoorR) &
-		  connect(Room, RoomP, DoorP) & not atDoor <-
-	.println("Se mueve a: ", DoorR, " para ir a la habitación contigua, ", Room);
-	move_towards(DoorR); 
-	!go(P). 
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP &
-		  not connect(RoomAg, RoomP, _) & connect(RoomAg, Room, DoorR) &
-		  connect(Room, RoomP, DoorP) & atDoor <-
-	.println("Se mueve a: ", DoorP, " para ir a la habitación ", RoomP);
-	move_towards(DoorP); 
-	!go(P). 
-+!go(P) : atRoom(RoomAg) & atRoom(P, RoomP) & not RoomAg == RoomP <-
-	.println("Owner is at ", RoomAg,", that is not a contiguous room to ", RoomP);
-	move_towards(P).                                                          
--!go(P) <- .println("Something goes wrong......").
-	                                                                        
++!consume(A)[source(self)] : not .intend(consume(A))
+   <- 
+   .print("Voy a tomar ",A);
+   consume(A);
+   .wait(2000);
+   .print("He tomado ",A).	                                                                        
 	
 +!get(drug) : .my_name(Name) <- 
    Time = math.ceil(math.random(4000));
@@ -207,6 +176,3 @@ pauta(amoxicilina,15,2).
    .println("Owner has finished to take the drug.").//;
    //-asked(drug).
 
-+msg(M)[source(Ag)] : .my_name(Name)
-   <- .print(Ag, " send ", Name, " the message: ", M);
-      -msg(M).
