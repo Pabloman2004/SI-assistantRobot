@@ -1,11 +1,18 @@
 package domotic;
-
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 public class Calendar {
     private int hora;
+    private LocalDateTime prov;
+    private LocalDate dia;
 
-    public Calendar() {
-        this.hora = 0;
-
+    public Calendar() {  
+        this.prov = LocalDateTime.now(); // Obtiene la fecha y hora actual      
+        this.dia = this.prov.toLocalDate(); // Obtiene la fecha 
+        this.hora= this.prov.getHour();
+        System.out.println("Día actual: " + this.dia);
+        System.out.println("Hora actual: " + this.hora); 
         // Hilo que actualiza la hora automáticamente
         new Thread(() -> {
             while (true) {
@@ -21,9 +28,13 @@ public class Calendar {
 
     private synchronized void increaseHour() {
         if (this.hora < 23) {
-            this.hora++;
+            this.hora ++; // Actualiza la hora
         } else {
             this.hora = 0;
+            this.dia.plusDays(1); // Incrementa el día
+        }
+        if(this.hora == 1) {
+            System.out.println("Día actual: " + this.dia); // Muestra el día actualizado
         }
         System.out.println("Hora actual: " + this.hora); // Muestra la hora actualizada
     }
