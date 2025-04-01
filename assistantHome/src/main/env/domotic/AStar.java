@@ -114,6 +114,7 @@ public class AStar {
                 openNode(node[col][row + 1]);
             if (col + 1 < maxCol)
                 openNode(node[col + 1][row]);
+            /* 
             if (row - 1 >= 0 && col - 1 >= 0)
                 openNode(node[col - 1][row - 1]);
             if (col - 1 >= 0 && row + 1 < maxRow)
@@ -122,7 +123,7 @@ public class AStar {
                 openNode(node[col + 1][row + 1]);
             if (col + 1 < maxCol && row - 1 >= 0)
                 openNode(node[col + 1][row -1]);
-
+            */
             int bestNodeIndex = -1;
             int bestNodefCost = Integer.MAX_VALUE;
             for (int i = 0; i < openList.size(); i++) {

@@ -211,11 +211,12 @@ public class HouseView extends GridWorldView {
 			} else {
 				drawMan(g, x, y, "walkr");         
 			};
+			/* 
 			if (lRobot.isNeigbour(lOwner)) {	
 				String o = "S";
 				g.setColor(Color.yellow);
 				drawString(g, x, y, defaultFont, o);
-			}                                                           
+			}   */                                                        
 		}			        
     } 
 	
