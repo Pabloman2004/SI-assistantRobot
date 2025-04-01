@@ -75,14 +75,13 @@ cantidad(amoxicilina,20).
          {
             takeDrug(enfermera,M);
             !reducirCantidad(M);
+            !go_at(enfermera,cabinet);
             .print("He cogido ", M);
          };
          close(cabinet);
 		 .send(owner,tell,espera);
          for(.member(pauta(M,H,F),L))
-         {
-         !go_at(enfermera,cabinet);
-         .print("Cogiendo ", M);
+         {       
          !go_at(enfermera,owner);
 		 	.print("Le he dado ", M);
             handDrug(M);

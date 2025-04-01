@@ -78,13 +78,12 @@ pauta(amoxicilina,15,2).
 +hour(H) <-
    .random(X);
 
-   if(X < 0.6){   	  
+   if(X < 0.7){   	  
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
       if(not L == []){
       if(not .intend(tomarMedicina(L)) & not quieto){
-		 .print("Voy a por medicinas");
-         .print(L);
-         !tomarMedicina(L);
+		.print("Voy a por medicinas ");
+      !tomarMedicina(L);
       }
      }
 	 else{
@@ -115,8 +114,9 @@ pauta(amoxicilina,15,2).
          for(.member(pauta(M,H,F),L))
          {
             .abolish(pauta(M,H,F));
-    		takeDrug(owner,M);
-            .print("He cogido la medicina", M);
+            !go_at(owner,cabinet);
+    		   takeDrug(owner,M);
+            .print("He cogido la medicina ", M);
             .send(enfermera, tell, comprobarConsumo(M));
          };
          for(.member(pauta(M,H,F),L))
