@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class HouseEnv extends Environment {
 
 	// common literals
-	public static final String ARRAYAG[] = { "enfermera", "owner" };
+	public static final String ARRAYAG[] = { "enfermera", "owner" }; //Array de agentes. Facilitará la gestión de estos cuando haya que añadir más.
 	public static final Literal of = Literal.parseLiteral("open(fridge)");
 	public static final Literal clf = Literal.parseLiteral("close(fridge)");
 	public static final Literal oc = Literal.parseLiteral("open(cabinet)");
@@ -35,8 +35,6 @@ public class HouseEnv extends Environment {
 	public static final Literal adob3 = Literal.parseLiteral("at(enfermera,lDoorBed3)");
 	public static final Literal adob2 = Literal.parseLiteral("at(enfermera,lDoorBed2)");
 	public static final Literal ac = Literal.parseLiteral("at(robot,cabinet)");
-	// public static final Literal ac =
-	// Literal.parseLiteral("at(enfermera,cabinet)");
 
 	public static final Literal oaf = Literal.parseLiteral("at(owner,fridge)");
 	public static final Literal oac1 = Literal.parseLiteral("at(owner,chair1)");
@@ -45,26 +43,17 @@ public class HouseEnv extends Environment {
 	public static final Literal oac4 = Literal.parseLiteral("at(owner,chair4)");
 	public static final Literal oasf = Literal.parseLiteral("at(owner,sofa)");
 	public static final Literal oad = Literal.parseLiteral("at(owner,delivery)");
-	private static final Literal oab1 = Literal.parseLiteral("at(owner,bed1)");
-	private static final Literal oab2 = Literal.parseLiteral("at(owner,bed2)");
-	private static final Literal oab3 = Literal.parseLiteral("at(owner,bed3)");
-	private static final Literal oac = Literal.parseLiteral("at(owner,cabinet)");
-	private static final Literal oaw = Literal.parseLiteral("at(owner,washer)");
-	// public static final Literal oac = Literal.parseLiteral("at(owner,cabinet)");
+	public static final Literal oab1 = Literal.parseLiteral("at(owner,bed1)");
+	public static final Literal oab2 = Literal.parseLiteral("at(owner,bed2)");
+	public static final Literal oab3 = Literal.parseLiteral("at(owner,bed3)");
+	public static final Literal oac = Literal.parseLiteral("at(owner,cabinet)");
+	public static final Literal oaw = Literal.parseLiteral("at(owner,washer)");
 
 	static Logger logger = Logger.getLogger(HouseEnv.class.getName());
 	private static Calendar calendar;
 
 	HouseModel model; // the model of the grid
-	/*
-	 * public enum medicamentos {
-	 * Simvastatina,
-	 * Aspirina,
-	 * Omeprazol,
-	 * LexotiroxinaSódica,
-	 * Ramipril
-	 * }
-	 */
+	
 
 	@Override
 	public void init(String[] args) {
@@ -89,7 +78,7 @@ public class HouseEnv extends Environment {
 	}
 
 	void updateThingsPlace() {
-		// get the fridge location
+		// get the location of the things in the house
 		String fridgePlace = model.getRoom(model.lFridge);
 		addPercept(Literal.parseLiteral("atRoom(fridge, " + fridgePlace + ")"));
 		String sofaPlace = model.getRoom(model.lSofa);
@@ -113,10 +102,6 @@ public class HouseEnv extends Environment {
 	}
 
 	/** creates the agents percepts based on the HouseModel */
-	// tengo que comproabr cada cuanto se ejecuta este metodo si se ejecuta cada vez
-	// que se mueve el robot o el owner con ir cambiando dinamicamente el
-	// medicamento
-	// si cada medicamento se toma el mismo numero de veces valdria
 	void updatePercepts() {
 		// clear the percepts of the agents
 		clearPercepts("enfermera");
@@ -132,74 +117,57 @@ public class HouseEnv extends Environment {
 			Location lAgent = model.getAgPos(i);
 			if (lAgent.distanceEuclidean(model.lFridge) < 2) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",fridge)"));
-				// System.out.println("[robot] is at fridge.");
 			}
 
 			if (lAgent.distanceEuclidean(lOwner) < 2 && i != 1) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",owner)"));
-				// System.out.println("[robot] is at owner.");
-
 			}
+
 			if (lAgent.distanceEuclidean(lRobot) < 2 && i != 0) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",robot)"));
-				// System.out.println("[robot] is at owner.");
 
 			}
 			if (lAgent.distanceEuclidean(model.lCabinet) < 2) {
-				// addPercept("robot", ac);
-				// addPercept("owner", ac);
 				for (int j = 0; j < ARRAYAG.length; j++) {
 					addPercept(ARRAYAG[j], Literal.parseLiteral("at(" + ARRAYAG[i] + ",cabinet)"));
 				}
-				// System.out.println("[robot] is at cabinet.");
 			}
 			if (lAgent.distanceEuclidean(model.lDeliver) < 2) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",delivery)"));
-				// System.out.println("[robot] is at delivery.");
 
 			}
 			if (lAgent.distanceEuclidean(model.lWasher) < 2) {
-				// addPercept(ARRAYAG[i], aw);
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",washer)"));
-				// System.out.println("[robot] is at washer.");
 
 			}
 		}
 
 		if (lOwner.distance(model.lChair1) == 0) {
 			addPercept("owner", oac1);
-			// System.out.println("[owner] is at Chair1.");
 		}
 
 		if (lOwner.distance(model.lChair2) == 0) {
 			addPercept("owner", oac2);
-			// System.out.println("[owner] is at Chair2.");
 		}
 
 		if (lOwner.distance(model.lChair3) == 0) {
 			addPercept("owner", oac3);
-			// System.out.println("[owner] is at Chair3.");
 		}
 
 		if (lOwner.distance(model.lChair4) == 0) {
 			addPercept("owner", oac4);
-			// System.out.println("[owner] is at Chair4.");
 		}
 		if (lOwner.distance(model.lBed1) == 0) {
 			addPercept("owner", oab1);
-			// System.out.println("[owner] is at Bed1.");
 		}
 		if (lOwner.distance(model.lBed2) == 0) {
 			addPercept("owner", oab2);
-			// System.out.println("[owner] is at Bed2.");
 		}
 		if (lOwner.distance(model.lBed3) == 0) {
 			addPercept("owner", oab3);
-			// System.out.println("[owner] is at Bed3.");
 		}
 		if (lOwner.distance(model.lSofa) == 0) {
 			addPercept("owner", oasf);
-			// System.out.println("[owner] is at Sofa.");
 		}
 
 		for (int i = 0; i < ARRAYAG.length; i++) {
@@ -214,8 +182,6 @@ public class HouseEnv extends Environment {
 
 	@Override
 	public boolean executeAction(String ag, Structure action) {
-
-		//System.out.println("[" + ag + "] doing: " + action);
 		int agNum = -1;
 		int it = -1;
 		while (++it < ARRAYAG.length && agNum == -1) {
@@ -223,10 +189,6 @@ public class HouseEnv extends Environment {
 				agNum = it;
 			}
 		}
-		// java.util.List<Literal> perceptsOwner = consultPercepts("owner");
-		// java.util.List<Literal> perceptsRobot = consultPercepts("enfermera");
-		// System.out.println("[owner] has the following percepts: "+perceptsOwner);
-		// System.out.println("[enfermera] has the following percepts: "+perceptsRobot);
 
 		boolean result = false;
 		if (action.getFunctor().equals("sit") && ag.equals("owner")) {
@@ -257,10 +219,10 @@ public class HouseEnv extends Environment {
 		else if (action.equals(clf)) { // clf = close(fridge)
 			result = model.closeFridge();
 		} 
-		else if (action.equals(oc)) { // of = open(fridge)
+		else if (action.equals(oc)) { // oc = open(cabinet)
 			result = model.openCabinet();
 		}
-		 else if (action.equals(clc)) { // clf = close(fridge)
+		 else if (action.equals(clc)) { // clc = close(cabinet)
 			result = model.closeCabinet();
 		} 
 		else if (action.getFunctor().equals("move_towards")) {
@@ -306,41 +268,7 @@ public class HouseEnv extends Environment {
 			result=model.addDrug(drug,qtd);
 			
 		}
-		
-		/*
-		 * else if (action.getFunctor().equals("deliver") && ag.equals("enfermera")) {
-		 * // wait 4 seconds to finish "deliver"
-		 * try {
-		 * String drug = action.getTerm(0).toString();
-		 * int qtd = Integer.parseInt(action.getTerm(1).toString());
-		 * result = model.deliver(drug,qtd);
-		 * } catch (Exception e) {
-		 * logger.info("Failed to execute action deliver!" + e);
-		 * }
-		 * 
-		 * }
-		 */
-
-		/*
-		 * else if (action.getFunctor().equals("getDelivery") && ag.equals("enfermera"))
-		 * {
-		 * try {
-		 * String drug = action.getTerm(0).toString();
-		 * result = model.getDelivery(drug);
-		 * model.setAuxiliarCargar(1);
-		 * } catch (Exception e) {
-		 * logger.info("Failed to execute action deliver!" + e);
-		 * }
-		 * }
-		 */
-		/*
-		 * else if (action.getFunctor().equals("addDrug") && ag.equals("enfermera")) {
-		 * String drug = action.getTerm(0).toString();
-		 * int qtd=Integer.parseInt(action.getTerm(1).toString());
-		 * result=model.addDrug(drug,qtd);
-		 * model.setAuxiliarCargar(0);
-		 * }
-		 */
+			
 		else {
 			logger.info("Failed to execute action " + action);
 		}

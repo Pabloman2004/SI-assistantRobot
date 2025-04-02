@@ -10,11 +10,11 @@ public class AStar {
     final int maxRow;
 
     Node[][] node;
-    Node startNode, goalNode, currentNode;
-    ArrayList<Node> openList = new ArrayList<>();
-    ArrayList<Node> checkedList = new ArrayList<>();
+    Node startNode, goalNode, currentNode; //Nodos inicial, objetivo y actual
+    ArrayList<Node> openList = new ArrayList<>(); //Lista de nodos a evaluar
+    ArrayList<Node> checkedList = new ArrayList<>();//Lista de nodos evaluados
 
-    ArrayList<Location> path = new ArrayList<>();
+    ArrayList<Location> path = new ArrayList<>();//Lista de nodos que forman el camino óptimo
 
     boolean goalReached = false;
     int step = 0;
@@ -106,6 +106,7 @@ public class AStar {
             currentNode.setAsChecked();
             checkedList.add(currentNode);
             openList.remove(currentNode);
+            //Movimientos de avance y retroceso en horizontal y vertical
             if (row - 1 >= 0)
                 openNode(node[col][row - 1]);
             if (col - 1 >= 0)
@@ -114,16 +115,7 @@ public class AStar {
                 openNode(node[col][row + 1]);
             if (col + 1 < maxCol)
                 openNode(node[col + 1][row]);
-            /* 
-            if (row - 1 >= 0 && col - 1 >= 0)
-                openNode(node[col - 1][row - 1]);
-            if (col - 1 >= 0 && row + 1 < maxRow)
-                openNode(node[col - 1][row + 1]);
-            if (row + 1 < maxRow && col + 1 < maxCol)
-                openNode(node[col + 1][row + 1]);
-            if (col + 1 < maxCol && row - 1 >= 0)
-                openNode(node[col + 1][row -1]);
-            */
+            
             int bestNodeIndex = -1;
             int bestNodefCost = Integer.MAX_VALUE;
             for (int i = 0; i < openList.size(); i++) {

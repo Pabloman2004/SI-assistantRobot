@@ -31,8 +31,6 @@ public class HouseModel extends GridWorldModel {
 	private boolean fridgeOpen = false; // whether the fridge is open
 	private boolean cabinetOpen = false; // whether the cabinet is open
 	private int carryingDrugs = 0; // numero de medicamentos que lleva el robot
-	// estas variables no la necesitamos porque cada medicamento tiene su cantidad
-	// disponible en el hashmap
 
 	private ArrayList<String> ownerDrugs = new ArrayList<>();
 
@@ -48,13 +46,7 @@ public class HouseModel extends GridWorldModel {
 	private int deliveredAspirina = 0;
 	private int deliveredAmoxicilina = 0;
 
-	// variable ownerMove
 	private int ownerMove=0;
-	// esta variable en principio tampoco se necesita a menos que de un medicamento
-	// se vaya a tomar varias
-	// dosis (no creo)
-
-	// int availableDrugs = 2; // how many drugs are available
 
 	// Initialization of the objects Location on the domotic home scene
 	public Location lSofa = new Location(GSize / 2, GSize - 2);
@@ -94,7 +86,8 @@ public class HouseModel extends GridWorldModel {
 	public static Area hall = new Area(0, GSize / 2 + 1, GSize / 4, GSize - 1);
 	public static Area hallway = new Area(GSize / 2 + 2, GSize / 2 - 1, GSize * 2 - 1, GSize / 2);
 
-	
+
+	//Metodos dedicados a obtener informacion sobre los medicamentos
 	public List<String> getOwnerDrugs() {
 		return ownerDrugs;
 	}
@@ -138,7 +131,6 @@ public class HouseModel extends GridWorldModel {
 		// initial location of robot (column 3, line 3)
 		// ag code 0 means the robot
 
-		// Deberia haber una estacion de carga del robot, es esta?
 		setAgPos(0, 8, 1);
 		setAgPos(1, 5, 9);
 		// setAgPos(2, GSize*2-1, GSize*3/5);
@@ -231,45 +223,6 @@ public class HouseModel extends GridWorldModel {
 		return byDefault;
 	}
 
-	// tienen getRoomCenter no se porque
-	Location getRoomCenter(String thing)
-	{
-		Location toret = kitchen.center();
-
-		if (thing.equals("bath1")) {
-			 toret =bath1.center();
-		}
-		;
-		if (thing.equals("bath2")) {
-			toret = bath2.center();
-		}
-		;
-		if (thing.equals("bedroom1")) {
-			 toret =bedroom1.center();
-		}
-		;
-		if (thing.equals("bedroom2")) {
-			toret =bedroom2.center();
-		}
-		;
-		if (thing.equals("bedroom3")) {
-			toret =bedroom3.center();    
-		}
-		;
-		if (thing.equals("hallway")) {
-			toret =hallway.center();
-		}
-		;
-		if (thing.equals("livingroom")) {
-			toret =livingroom.center();
-		}
-		;
-		if (thing.equals("hall")) {
-			toret =hall.center();
-		}
-		;
-		return toret;
-	}
 	boolean sit(int Ag, Location dest) {
 		Location loc = getAgPos(Ag);
 		if (loc.isNeigbour(dest)) {
@@ -324,17 +277,16 @@ public class HouseModel extends GridWorldModel {
 		if (Ag < 1) {// el agente 0 es la enfermera
 			return (isFree(x, y) && !hasObject(WASHER, x, y) && !hasObject(TABLE, x, y) && !hasObject(BED, x, y) &&
 					!hasObject(SOFA, x, y) && !hasObject(CABINET, x, y) && !hasObject(CHAIR, x, y) && !hasObject(FRIDGE, x, y));
-		} else { // este agente es el paciente
+		} else { // este agente es el owner
 			return (isFree(x, y) && !hasObject(WASHER, x, y) && !hasObject(CABINET, x, y) && !hasObject(TABLE, x, y) && !hasObject(FRIDGE, x, y) && !hasObject(DELIVER, x, y));
 		}
 	}
 
-	// metodo getOwnerMove()
 	public int getOwnerMove() {
 		return ownerMove;
 	}
 
-	// metodo calclaulateOwnerDir
+	
 	public void calculateOwnerDir(int Ag, Location dest) {
 		if (Ag == 1) {
 			Location ag = getAgPos(Ag);
@@ -350,7 +302,7 @@ public class HouseModel extends GridWorldModel {
 		}
 	}
 
-	// moveTowards usando Astar
+	// moveTowards usando algoritmo A*
 	public boolean moveTowards(int Ag, Location dest) {
 
 		AStar path = new AStar(this, Ag, getAgPos(Ag), dest);
