@@ -115,28 +115,28 @@ public class HouseEnv extends Environment {
 
 		for (int i = 0; i < ARRAYAG.length; i++) {
 			Location lAgent = model.getAgPos(i);
-			if (lAgent.distanceEuclidean(model.lFridge) < 2) {
+			if (lAgent.distance(model.lFridge) < 2) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",fridge)"));
 			}
 
-			if (lAgent.distanceEuclidean(lOwner) < 2 && i != 1) {
+			if (lAgent.distance(lOwner) < 2 && i != 1) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",owner)"));
 			}
 
-			if (lAgent.distanceEuclidean(lRobot) < 2 && i != 0) {
+			if (lAgent.distance(lRobot) < 2 && i != 0) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",robot)"));
 
 			}
-			if (lAgent.distanceEuclidean(model.lCabinet) < 2) {
+			if (lAgent.distance(model.lCabinet) < 2) {
 				for (int j = 0; j < ARRAYAG.length; j++) {
 					addPercept(ARRAYAG[j], Literal.parseLiteral("at(" + ARRAYAG[i] + ",cabinet)"));
 				}
 			}
-			if (lAgent.distanceEuclidean(model.lDeliver) < 2) {
+			if (lAgent.distance(model.lDeliver) < 2) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",delivery)"));
 
 			}
-			if (lAgent.distanceEuclidean(model.lWasher) < 2) {
+			if (lAgent.distance(model.lWasher) < 2) {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",washer)"));
 
 			}

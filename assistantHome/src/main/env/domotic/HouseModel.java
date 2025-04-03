@@ -34,11 +34,11 @@ public class HouseModel extends GridWorldModel {
 
 	private ArrayList<String> ownerDrugs = new ArrayList<>();
 
-	private int availableParacetamol = 20;
-	private int availableIbuprofeno = 20;
-	private int availableLorazepam = 20;
-	private int availableAspirina = 20;
-	private int availableAmoxicilina = 20;
+	private int availableParacetamol = 1;
+	private int availableIbuprofeno = 1;
+	private int availableLorazepam = 1;
+	private int availableAspirina = 1;
+	private int availableAmoxicilina = 1;
 
 	private int deliveredParacetamol = 0;
 	private int deliveredIbuprofeno = 0;
@@ -374,18 +374,38 @@ public class HouseModel extends GridWorldModel {
 		switch (drug) {
 			case "paracetamol":
 				availableParacetamol--;
+				if(availableParacetamol <= 0) {
+					System.out.println("Medicina agotada. Rellenando...");
+					addDrug("paracetamol",20);
+				}
 				break;
 			case "ibuprofeno":
 				availableIbuprofeno--;
+				if(availableIbuprofeno <= 0) {
+					System.out.println("Medicina agotada. Rellenando...");
+					addDrug("ibuprofeno", 20);
+				}
 				break;
 			case "lorazepam":
 				availableParacetamol--;
+				if(availableParacetamol <= 0) {
+					System.out.println("Medicina agotada. Rellenando...");
+					addDrug("lorazepam", 20);
+				}
 				break;
 			case "aspirina":
 				availableAspirina--;
+				if(availableAspirina <= 0) {
+					System.out.println("Medicina agotada. Rellenando...");
+					addDrug("aspirina", 20);
+				}
 				break;
 			case "amoxicilina":
 				availableAmoxicilina--;
+				if(availableAmoxicilina <= 0) {
+					System.out.println("Medicina agotada. Rellenando...");
+					addDrug("amoxicilina", 20);
+				}
 				break;
 			default:
 				break;
@@ -551,6 +571,11 @@ public class HouseModel extends GridWorldModel {
 		return dest;
 	}
 
+
+
+
+
+/* 
 	public boolean deliver(String drug, int qtd) {
 		switch (drug) {
 			case "paracetamol":
@@ -596,5 +621,6 @@ public class HouseModel extends GridWorldModel {
 		}
 		return true;
 	}
+*/
 
 }

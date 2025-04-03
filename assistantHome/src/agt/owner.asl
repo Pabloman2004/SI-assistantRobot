@@ -24,7 +24,7 @@
 pauta(paracetamol,8,6).
 pauta(ibuprofeno,12,6).
 pauta(lorazepam,22,23).
-pauta(aspirina,8,8).
+pauta(aspirina,1,2).
 pauta(amoxicilina,15,2).
 
 
@@ -35,7 +35,7 @@ pauta(amoxicilina,15,2).
 	  {
 	  	.send(enfermera,tell,I);
 	  }.
-//Owner cambia las pautas,para ello utiliza n�meros aleatorios e informa al robot.
+//Owner cambia las pautas,para ello utiliza numeros aleatorios e informa al robot.
 +!cambiarPauta(T)
 	<-.findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
 		.print("Reseteando medicinas:");
