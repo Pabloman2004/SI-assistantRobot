@@ -253,21 +253,7 @@ public class HouseEnv extends Environment {
 		else if (action.getFunctor().equals("updatePercepts")) {
 			result = true;
 		}
-		else if (action.getFunctor().equals("deliver") && ag.equals("proveedor")) {
-			// wait 4 seconds to finish "deliver"
-			try {
-				String drug = action.getTerm(0).toString();
-				int qtd = Integer.parseInt(action.getTerm(1).toString());
-				result = model.deliver(drug,qtd);
-			} catch (Exception e) {
-				logger.info("Failed to execute action deliver!" + e);
-			}
-		}else if (action.getFunctor().equals("addDrug") && ag.equals("auxiliar")) {
-			String drug = action.getTerm(0).toString();
-			int qtd=Integer.parseInt(action.getTerm(1).toString());
-			result=model.addDrug(drug,qtd);
-			
-		}
+		
 			
 		else {
 			logger.info("Failed to execute action " + action);

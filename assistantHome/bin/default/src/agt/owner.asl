@@ -24,7 +24,7 @@
 pauta(paracetamol,8,6).
 pauta(ibuprofeno,12,6).
 pauta(lorazepam,22,23).
-pauta(aspirina,8,8).
+pauta(aspirina,1,2).
 pauta(amoxicilina,15,2).
 
 
@@ -35,7 +35,7 @@ pauta(amoxicilina,15,2).
 	  {
 	  	.send(enfermera,tell,I);
 	  }.
-//Owner cambia las pautas,para ello utiliza n�meros aleatorios e informa al robot.
+//Owner cambia las pautas,para ello utiliza numeros aleatorios e informa al robot.
 +!cambiarPauta(T)
 	<-.findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
 		.print("Reseteando medicinas:");
@@ -63,13 +63,13 @@ pauta(amoxicilina,15,2).
     }
     elif(X < 0.7){
     .random([chair1,chair2,chair3,chair4,sofa],Y);
-    .print("Voy a sentarme en",Y);
+    .print("Voy a sentarme en ",Y);
     !go_at(owner,Y);
     //sit(Y);
     .print("Me siento");
     }else{
     .random([bed1,bed2,bed3],Y);
-    .print("Voy a echarme una siesta en");
+    .print("Voy a echarme una siesta en ",Y);
     !go_at(owner,Y);
     .print("Me acuesto");
     }
@@ -158,3 +158,37 @@ pauta(amoxicilina,15,2).
    .print("He tomado ",A).	                                                                        
 	
 
+
+/*
++day(D) <- 
+   .random(X); // Genera un número aleatorio X
+   .print("funciona bien? ",X);//comprobacion para ver cuando entra por aqui 
+   if(X < 0.2) { // 20% de posibilidad de cambiar las pautas
+   .findall(pauta(M, H, F), .belief(pauta(M, H, F)), L); // Encuentra todas las pautas
+
+      if (not L == []) {
+          // Extrae solo los nombres de los medicamentos (M)
+          .findall(M, .member(pauta(M, _, _), L), Medicines); // Crea una lista con solo los nombres de los medicamentos
+
+         .random(Medicines, M); // Escoge un medicamento aleatorio
+         .print("Medicamento eliminado: ", M);
+         .send(enfermera, tell, medicamentoEliminado(M)); // Informa al robot
+         for(.member(pauta(M, H, F), L)) {
+               .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
+            }
+            !mostrarPautaActual;
+            }
+         else {
+         !curado;
+       }
+ 
+ }.
+
++!curado <- .print("Paciente curado").
+
++!mostrarPautaActual <- .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+   .print("Pautas actuales: ",L).
+
++!curado <- 
+.print("Estoy curado, no necesito medicinas").
+*/

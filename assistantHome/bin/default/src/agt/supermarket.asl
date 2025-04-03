@@ -8,4 +8,3 @@ last_order_id(1). // initial belief
      //deliver(Product,Qtd);  
 	 .wait(3000);
      .send(Ag, tell, delivered(Product,Qtd,OrderId)).
-

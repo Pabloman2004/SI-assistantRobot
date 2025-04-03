@@ -28,7 +28,6 @@ cantidad(amoxicilina,20).
      !go_at(enfermera,P).
 -!go_at(enfermera,P)[source(self)]<- .print("Estoy apartando");apartar;.wait(5);!go_at(enfermera,P).
 
-+pautaNueva(M,H,F)[source(owner)]<-.abolish(pauta(M,_,_));+pauta(M,H,F);.abolish(pautaNueva(M,H,F)).
 
 +hour(H)<-
 	.findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);

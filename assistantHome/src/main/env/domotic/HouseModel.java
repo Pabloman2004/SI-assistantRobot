@@ -34,11 +34,11 @@ public class HouseModel extends GridWorldModel {
 
 	private ArrayList<String> ownerDrugs = new ArrayList<>();
 
-	private int availableParacetamol = 1;
-	private int availableIbuprofeno = 1;
-	private int availableLorazepam = 1;
-	private int availableAspirina = 1;
-	private int availableAmoxicilina = 1;
+	private int availableParacetamol = 20;
+	private int availableIbuprofeno = 20;
+	private int availableLorazepam = 20;
+	private int availableAspirina = 20;
+	private int availableAmoxicilina = 20;
 
 	private int deliveredParacetamol = 0;
 	private int deliveredIbuprofeno = 0;
@@ -307,9 +307,9 @@ public class HouseModel extends GridWorldModel {
 
 		AStar path = new AStar(this, Ag, getAgPos(Ag), dest);
 		Location nextMove = path.getNextMove();
-		if (nextMove == null) {
-			System.out.println("No se encontró un camino válido para " + Ag + " hacia " + dest);
-		}
+		//if (nextMove == null) {
+		//	System.out.println("No se encontró un camino válido para " + Ag + " hacia " + dest);
+		//}
 		if (nextMove != null) {
 			calculateOwnerDir(Ag, nextMove);
 			setAgPos(Ag, nextMove);
@@ -621,6 +621,6 @@ public class HouseModel extends GridWorldModel {
 		}
 		return true;
 	}
-	
+
 
 }
