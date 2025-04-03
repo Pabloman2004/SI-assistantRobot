@@ -575,7 +575,7 @@ public class HouseModel extends GridWorldModel {
 
 
 
-/* 
+
 	public boolean deliver(String drug, int qtd) {
 		switch (drug) {
 			case "paracetamol":
@@ -621,6 +621,6 @@ public class HouseModel extends GridWorldModel {
 		}
 		return true;
 	}
-*/
+	
 
 }
