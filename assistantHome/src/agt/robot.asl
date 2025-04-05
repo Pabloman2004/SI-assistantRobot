@@ -124,6 +124,11 @@ cantidad(amoxicilina,20).
 	!comprobar(M,H);
    close(cabinet).
 
+//si le manda el owner el mensaje de que ha tomado la medicina, el robot lo comprueba.
++comprobarConsumo(M)[source(owner)] : cantidad(M,H)<- 
+   .print("Comprobando consumo ",M);
+   !comprobar(M,H).
+
 //Robot revisa en su conocimiento si hay diferencia entre lo que ve en el cabinet y lo que sab�a que hab�a(-1).
 +!comprobar(M,H)[source(self)]  <-
 	comprobarConsumo(M,H);
