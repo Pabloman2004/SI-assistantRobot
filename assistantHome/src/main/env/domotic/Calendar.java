@@ -31,7 +31,7 @@ public class Calendar {
             this.hora ++; // Actualiza la hora
         } else {
             this.hora = 0;
-            this.dia.plusDays(1); // Incrementa el día
+            this.dia = this.dia.plusDays(1); // Incrementa el día this.dia.plusDays(1);
         }
         if(this.hora == 1) {
             System.out.println("Día actual: " + this.dia); // Muestra el día actualizado
@@ -41,6 +41,10 @@ public class Calendar {
 
     public synchronized int getHora() {
         return this.hora;
+    }
+
+    public synchronized int getDia() {
+        return this.dia.getDayOfMonth(); // Devuelve el día del mes
     }
     
 }

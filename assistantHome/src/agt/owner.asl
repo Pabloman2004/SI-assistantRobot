@@ -74,6 +74,41 @@ pauta(amoxicilina,15,2).
 	 }
    }.
 
++day(D)<-
+   // 15% de probabilidad de cambiar las pautas 
+   .random(X); // Genera un número aleatorio X
+   .print("funciona? ",X);//comprobacion para ver cuando entra por aqui
+
+   if( X < 0.1){
+   .print("Añadiendo medicamento a la pauta");
+   }
+
+   elif( X < 0.7) { // 20% de posibilidad de cambiar las pautas
+   .findall(pauta(M, H, F), .belief(pauta(M, H, F)), L); // Encuentra todas las pautas
+
+      if (not L == []) {
+          // Extrae solo los nombres de los medicamentos (M)
+          .findall(M, .member(pauta(M, _, _), L), Medicines); // Crea una lista con solo los nombres de los medicamentos
+
+         .random(Medicines, M); // Escoge un medicamento aleatorio
+         .print("Medicamento eliminado: ", M);
+         .send(enfermera, tell, medicamentoEliminado(M)); // Informa al robot
+         for(.member(pauta(M, H, F), L)) {
+               .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
+            }
+            !mostrarPautaActual;
+            }
+         else {
+         !curado;
+      }
+
+}.
+
+
++!curado <- .print("Paciente curado").
++!mostrarPautaActual <- .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+   .print("Pautas actuales: ",L).
+
 +!go_at(owner,P)[source(self)] : at(owner,P) <- .print("He llegado a ",P).
 +!go_at(owner,P)[source(self)] : not at(owner,P)
   <- move_towards(P);

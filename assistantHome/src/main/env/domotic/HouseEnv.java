@@ -53,12 +53,13 @@ public class HouseEnv extends Environment {
 	private static Calendar calendar;
 
 	HouseModel model; // the model of the grid
-	
+	int lastDay;
 
 	@Override
 	public void init(String[] args) {
 		model = new HouseModel();
 		calendar = new Calendar();
+		lastDay = 0;
 		if (args.length == 1 && args[0].equals("gui")) {
 			HouseView view = new HouseView(model);
 			model.setView(view);
@@ -176,6 +177,17 @@ public class HouseEnv extends Environment {
 
 		for (int i = 0; i < model.getOwnerDrugs().size(); i++) {
 			addPercept("owner", Literal.parseLiteral("has(owner," + model.getOwnerDrugs().get(i) + ")"));
+		}
+
+
+		//tengo que hacer esta comprobacion para que no me actualice la perepcion cada vez que se ejecute el updatePercept, sino solo cuando cambie el dia
+		//Funciona pero no se porque si hago debug no veo la percepcion de dia en owner
+		if(this.lastDay != calendar.getDia()) {
+			for (int i = 0; i < ARRAYAG.length; i++) {
+					addPercept("owner", Literal.parseLiteral("day(" + calendar.getDia() + ")"));
+					
+				}
+			this.lastDay = calendar.getDia();	
 		}
 
 	}

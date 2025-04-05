@@ -26,7 +26,7 @@ cantidad(amoxicilina,20).
 +!go_at(enfermera,P)[source(self)] : not at(enfermera,P) 
   <- move_towards(P);
      !go_at(enfermera,P).
--!go_at(enfermera,P)[source(self)]<- .print("Estoy apartando");apartar;.wait(5);!go_at(enfermera,P).
+-!go_at(enfermera,P)[source(self)]<- apartar;.wait(5);!go_at(enfermera,P).
 
 
 +hour(H)<-
@@ -153,3 +153,9 @@ cantidad(amoxicilina,20).
                                      
 +?time(T) : true
   <-  time.check(T).
+
+
++medicamentoEliminado(M)<-
+   .abolish(pauta(M,H,F));
+   .abolish(cantidad(M,H));
+   .print("Medicamento eliminado de la pauta: ",M).
