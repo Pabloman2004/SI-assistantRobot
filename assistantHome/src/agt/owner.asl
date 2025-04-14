@@ -83,7 +83,7 @@ pauta_nueva(jarabe,20,12).
 +day(D)<-
    // 15% de probabilidad de cambiar las pautas 
    .random(X); // Genera un número aleatorio X
-   if( X < 0.9){
+   if( X < 0.01){
    .print("Añadiendo medicamento a la pauta");
    .findall(pauta_nueva(M,H,F),pauta_nueva(M,H,F),L);
    .random(L,Nuevo); //se escoge un medicamento aleatorio de la lista de medicamentos nuevos
@@ -103,7 +103,7 @@ pauta_nueva(jarabe,20,12).
       
    }
    
-   elif( X < 0.01) { // 20% de posibilidad de cambiar las pautas
+   elif( X < 0.9) { // 20% de posibilidad de cambiar las pautas
    .findall(pauta(M, H, F), .belief(pauta(M, H, F)), L); // Encuentra todas las pautas
 
       if (not L == []) {
@@ -115,6 +115,7 @@ pauta_nueva(jarabe,20,12).
          .send(enfermera, tell, medicamentoEliminado(M)); // Informa al robot
          for(.member(pauta(M, H, F), L)) {
                .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
+               .send(self,tell,pauta_nueva(M,H,F)); // la pauta eliminada pasa a ser una pauta que en un futuro se puede añadir a la base de conocimiento
             }
             !mostrarPautaActual;
             }
