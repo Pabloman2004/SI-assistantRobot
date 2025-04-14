@@ -387,7 +387,7 @@ public class HouseModel extends GridWorldModel {
 				}
 				break;
 			case "lorazepam":
-				availableParacetamol--;
+				availableLorazepam--;
 				if(availableParacetamol <= 0) {
 					System.out.println("Medicina agotada. Rellenando...");
 					addDrug("lorazepam", 20);

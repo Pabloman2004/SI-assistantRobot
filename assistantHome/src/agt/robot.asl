@@ -164,3 +164,4 @@ cantidad(amoxicilina,20).
    .abolish(pauta(M,H,F));
    .abolish(cantidad(M,H));
    .print("Medicamento eliminado de la pauta: ",M).
+
