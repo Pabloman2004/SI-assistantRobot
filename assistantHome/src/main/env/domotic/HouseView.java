@@ -176,7 +176,7 @@ public class HouseView extends GridWorldView {
 		//Location lGuest = hmodel.getAgPos(2);
 		String objPath = currentDirectory;
 
-		if (id < 1) { 
+		if (id == 2) { 
 			if (!lRobot.equals(lOwner) && !lRobot.equals(hmodel.lFridge)) {
 				c = Color.yellow;
 				if (hmodel.getCarryingDrugs()>0) {//c = Color.orange;
@@ -188,9 +188,25 @@ public class HouseView extends GridWorldView {
 					drawImage(g,x,y,objPath);
 				};
 				g.setColor(Color.black);
-				super.drawString(g, x, y, defaultFont, "Rob");
+				super.drawString(g, x, y, defaultFont, "auxliar");
 			}
-		} else if (id > 1) {  
+		} 
+
+		else if (id == 0) { 
+			if (!lRobot.equals(lOwner) && !lRobot.equals(hmodel.lFridge)) {
+				c = Color.yellow;
+				if (hmodel.getCarryingDrugs()>0) {//c = Color.orange;
+					//super.drawAgent(g, x, y, c, -1);
+					objPath = "/doc/beerBot.png";//currentDirectory.concat("/doc/beerBot.png");
+					drawImage(g,x,y,objPath);
+				} else {
+					objPath = "/doc/bot.png";//currentDirectory.concat("/doc/bot.png");
+					drawImage(g,x,y,objPath);
+				};
+				g.setColor(Color.black);
+				super.drawString(g, x, y, defaultFont, "nurse");
+			}
+		} else if (id == 1) {  
 		    drawMan(g, x, y, "down"); 
 		} else { 
 			if (lOwner.equals(hmodel.lChair1)) {
