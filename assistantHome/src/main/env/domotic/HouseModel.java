@@ -23,14 +23,14 @@ public class HouseModel extends GridWorldModel {
 	public static final int BED = 1024;
 	public static final int DELIVER = 2048;
 	public static final int CABINET = 4096;
-
+	public static final int RETRETE = 8192;
 	// the grid size
 	public static final int GSize = 12; // Cells
-	public final int GridSize = 1080; // Width
+	public static final int GridSize = 1080; // Width
 
 	private boolean fridgeOpen = false; // whether the fridge is open
 	private boolean cabinetOpen = false; // whether the cabinet is open
-	private int carryingDrugs = 0; // numero de medicamentos que lleva el robot
+	private int carryingDrugs = 0;
 
 	private ArrayList<String> ownerDrugs = new ArrayList<>();
 
@@ -45,8 +45,11 @@ public class HouseModel extends GridWorldModel {
 	private int deliveredLorazepam = 0;
 	private int deliveredAspirina = 0;
 	private int deliveredAmoxicilina = 0;
-
+	
 	private int ownerMove=0;
+	private int auxiliarCargar=0;
+	
+	private List<Integer> bateriaRobots;
 
 	// Initialization of the objects Location on the domotic home scene
 	public Location lSofa = new Location(GSize / 2, GSize - 2);
@@ -54,68 +57,41 @@ public class HouseModel extends GridWorldModel {
 	public Location lChair3 = new Location(GSize / 2 - 1, GSize - 3);
 	public Location lChair2 = new Location(GSize / 2 + 1, GSize - 4);
 	public Location lChair4 = new Location(GSize / 2, GSize - 4);
-	public Location lDeliver = new Location(0, GSize - 1);
-	public Location lWasher = new Location(GSize / 3, 0);
-	public Location lFridge = new Location(2, 0);
+	public Location lDeliver = new Location(0, 10);
+	public Location lWasher = new Location(GSize / 2, 0);
+	public Location lFridge = new Location(3, 0);
 	public Location lTable = new Location(GSize / 2, GSize - 3);
+	public Location lVacio = new Location(GSize / 2 + 1, GSize - 3);
 	public Location lBed2 = new Location(GSize + 2, 0);
 	public Location lBed3 = new Location(GSize * 2 - 3, 0);
 	public Location lBed1 = new Location(GSize + 1, GSize * 3 / 4);
 	public Location lCabinet = new Location(10, 0);
+	public Location lRetrete = new Location(23, 7);
+	public Location lCargadorRobot = new Location(8, 0);
+	public Location lCargadorAuxiliar = new Location(2,7);
 
 	// Initialization of the doors location on the domotic home scene
 	public Location lDoorHome = new Location(0, GSize - 1);
 	public Location lDoorKit1 = new Location(0, GSize / 2);
 	public Location lDoorKit2 = new Location(GSize / 2 + 1, GSize / 2 - 1);
 	public Location lDoorSal1 = new Location(GSize / 4, GSize - 1);
-	public Location lDoorSal2 = new Location(GSize + 1, GSize / 2);
-	public Location lDoorBed1 = new Location(GSize - 1, GSize / 2);
+	public Location lDoorSal2 = new Location(GSize / 2 + 2, GSize / 2);
+	public Location lDoorBed1 = new Location(GSize + 1, GSize / 2);
 	public Location lDoorBath1 = new Location(GSize - 1, GSize / 4 + 1);
 	public Location lDoorBed3 = new Location(GSize * 2 - 1, GSize / 4 + 1);
 	public Location lDoorBed2 = new Location(GSize + 1, GSize / 4 + 1);
 	public Location lDoorBath2 = new Location(GSize * 2 - 4, GSize / 2 + 1);
 
 	// Initialization of the area modeling the home rooms
-	public static Area kitchen = new Area(0, 0, GSize / 2 + 1, GSize / 2 - 1);
-	public static Area livingroom = new Area(GSize / 3, GSize / 2 + 1, GSize, GSize - 1);
-	public static Area bath1 = new Area(GSize / 2 + 2, 0, GSize - 1, GSize / 3);
-	public static Area bath2 = new Area(GSize * 2 - 3, GSize / 2 + 1, GSize * 2 - 1, GSize - 1);
-	public static Area bedroom1 = new Area(GSize + 1, GSize / 2 + 1, GSize * 2 - 4, GSize - 1);
-	public static Area bedroom2 = new Area(GSize, 0, GSize * 3 / 4 - 1, GSize / 3);
-	public static Area bedroom3 = new Area(GSize * 3 / 4, 0, GSize * 2 - 1, GSize / 3);
-	public static Area hall = new Area(0, GSize / 2 + 1, GSize / 4, GSize - 1);
-	public static Area hallway = new Area(GSize / 2 + 2, GSize / 2 - 1, GSize * 2 - 1, GSize / 2);
-
-
-	//Metodos dedicados a obtener informacion sobre los medicamentos
-	public List<String> getOwnerDrugs() {
-		return ownerDrugs;
-	}
-
-	public int getAvailableParacetamol() {
-		return availableParacetamol;
-	}
-
-	public int getAvailableIbuprofeno() {
-		return availableIbuprofeno;
-	}
-
-	public int getAvailableLorazepam() {
-		return availableLorazepam;
-	}
-
-	public int getAvailableAspirina() {
-		return availableAspirina;
-	}
-
-	public int getAvailableAmoxicilina() {
-		return availableAmoxicilina;
-	}
-
-	public int getCarryingDrugs() {
-		return carryingDrugs;
-	}
-
+	public static final Area kitchen = new Area(-1, -1, 7, 6);
+    public static final Area livingroom = new Area(3, 6, 12, 11);
+    public static final Area bath1 = new Area(7, 0, 12, 4);
+    public static final Area bath2 = new Area(20, 6, 23, 12);
+    public static final Area bedroom1 = new Area(12, 6, 20, 11);
+    public static final Area bedroom2 = new Area(12, 0, 18, 4);
+    public static final Area bedroom3 = new Area(18, 0, 23, 4);
+    public static final Area hall = new Area(0, 6, 3, 11);
+    public static final Area hallway = new Area(7, 4, 24, 6);
 	/*
 	 * Modificar el modelo para que la casa sea un conjunto de habitaciones
 	 * Dar un codigo a cada habitación y vincular un Area a cada habitación
@@ -123,16 +99,79 @@ public class HouseModel extends GridWorldModel {
 	 * Crear un método para la identificación del tipo de agente existente
 	 * Identificar objetos globales que precisen de un único identificador
 	 */
+	public List<String> getOwnerDrugs()
+	{
+		return ownerDrugs;
+	}
+	public int getAvailableParacetamol()
+	{
+		return availableParacetamol;
+	}
+	public int getCarryingDrugs()
+	{
+		return carryingDrugs;
+	}
+	public int getAvailableIbuprofeno()
+	{
+		return availableIbuprofeno;
+	}
+	public int getAvailableLorazepam()
+	{
+		return availableLorazepam;
+	}
+	public int getAvailableAspirina()
+	{
+		return availableAspirina;
+	}
+	public int getAvailableAmoxicilina()
+	{
+		return availableAmoxicilina;
+	}
+	public int getAuxiliarCargar()
+	{
+		return auxiliarCargar;
+	}
+	public void setAuxiliarCargar(int valor)
+	{
+		auxiliarCargar=valor;
+	}
+	public int getBateriaRobot(int i)
+	{
+		return bateriaRobots.get(i);
+	}
+	public void setBateriaRobot(String ag,int valor)
+	{
+		if(ag.equals("robot"))
+			bateriaRobots.set(0,valor);
+		else if(ag.equals("auxiliar"))
+			bateriaRobots.set(2,valor);
+	}
+	public void reduceBateriaRobot(int i)
+	{
+		if(bateriaRobots.get(i)>0)
+			bateriaRobots.set(i,bateriaRobots.get(i)-1);			
+	}
 
+	public void increaseBateriaRobot(int i)
+	{
+		if(bateriaRobots.get(i)>0)
+			bateriaRobots.set(i,bateriaRobots.get(i)+10 >= 200 ? 200 : bateriaRobots.get(i)+10);
+	}
 	public HouseModel() {
 		// create a GSize x 2GSize grid with 3 mobile agent
-		super(2 * GSize, GSize, 2);
-
+		super(2 * GSize, GSize, 3);
+		bateriaRobots=new ArrayList<>();
+		for(int i=0;i<=2;i++)
+		{
+			bateriaRobots.add(0);
+		}
 		// initial location of robot (column 3, line 3)
 		// ag code 0 means the robot
-
+		// setAgPos(0, 2, 4);
 		setAgPos(0, 8, 1);
 		setAgPos(1, 5, 9);
+		setAgPos(2, 0, 0);
+		// setAgPos(1, 4, 4);
 		// setAgPos(2, GSize*2-1, GSize*3/5);
 
 		// Do a new method to create literals for each object placed on
@@ -151,36 +190,42 @@ public class HouseModel extends GridWorldModel {
 		add(BED, lBed1);
 		add(BED, lBed2);
 		add(BED, lBed3);
+		add(DELIVER, lDeliver);
 		add(CABINET, lCabinet);
+		add(RETRETE, lRetrete);
+		add(RETRETE, lCargadorAuxiliar);
+		add(RETRETE, lCargadorRobot);
+		//add(VACIO,lVacio);
 
 		addWall(GSize / 2 + 1, 0, GSize / 2 + 1, GSize / 2 - 2);
-		add(DOOR, lDoorKit2);
-		// addWall(GSize/2+1, GSize/2-1, GSize/2+1, GSize-2);
-		add(DOOR, lDoorSal1);
+        add(DOOR, lDoorKit2);
+        // addWall(GSize/2+1, GSize/2-1, GSize/2+1, GSize-2);
+        add(DOOR, lDoorSal1);
 
-		addWall(GSize / 2 + 1, GSize / 4 + 1, GSize - 2, GSize / 4 + 1);
-		// addWall(GSize+1, GSize/4+1, GSize*2-1, GSize/4+1);
-		add(DOOR, lDoorBath1);
-		// addWall(GSize+1, GSize*2/5+1, GSize*2-2, GSize*2/5+1);
-		addWall(GSize + 2, GSize / 4 + 1, GSize * 2 - 2, GSize / 4 + 1);
-		addWall(GSize * 2 - 6, 0, GSize * 2 - 6, GSize / 4);
-		add(DOOR, lDoorBed1);
+        addWall(GSize / 2 + 1, GSize / 4 + 1, GSize - 2, GSize / 4 + 1);
+        // addWall(GSize+1, GSize/4+1, GSize2-1, GSize/4+1);
+        add(DOOR, lDoorBath1);
+        // addWall(GSize+1, GSize2/5+1, GSize2-2, GSize2/5+1);
+        addWall(GSize + 2, GSize / 4 + 1, GSize * 2 - 2, GSize / 4 + 1);
+        addWall(GSize * 2 - 6, 0, GSize * 2 - 6, GSize / 4);
+        add(DOOR, lDoorBed1);
+		
+        addWall(GSize, 0, GSize, GSize / 4 + 1);
+        // addWall(GSize+1, GSize/4+1, GSize, GSize/4+1);
+        add(DOOR, lDoorBed2);
 
-		addWall(GSize, 0, GSize, GSize / 4 + 1);
-		// addWall(GSize+1, GSize/4+1, GSize, GSize/4+1);
-		add(DOOR, lDoorBed2);
+        addWall(1, GSize / 2, GSize / 2 + 1, GSize / 2);
+        add(DOOR, lDoorKit1); 
+        add(DOOR, lDoorSal2); 
 
-		addWall(1, GSize / 2, GSize - 1, GSize / 2);
-		add(DOOR, lDoorKit1);
-		add(DOOR, lDoorSal2);
+        addWall(GSize / 4, GSize / 2 + 1, GSize / 4, GSize - 2);
 
-		addWall(GSize / 4, GSize / 2 + 1, GSize / 4, GSize - 2);
-
-		addWall(GSize, GSize / 2, GSize, GSize - 1);
-		addWall(GSize * 2 - 4, GSize / 2 + 2, GSize * 2 - 4, GSize - 1);
-		addWall(GSize + 2, GSize / 2, GSize * 2 - 1, GSize / 2);
-		add(DOOR, lDoorBed3);
-		add(DOOR, lDoorBath2);
+        addWall(GSize, GSize / 2, GSize, GSize - 1);
+        addWall(GSize * 2 - 4, GSize / 2 + 2, GSize * 2 - 4, GSize - 1);
+        addWall(GSize / 2 + 3, GSize / 2, GSize, GSize / 2);
+        addWall(GSize + 2, GSize / 2, GSize * 2 - 1, GSize / 2);
+        add(DOOR, lDoorBed3);
+        add(DOOR, lDoorBath2);
 
 	}
 
@@ -356,7 +401,7 @@ public class HouseModel extends GridWorldModel {
 				toRet = availableIbuprofeno;
 				break;
 			case "lorazepam":
-				toRet = availableParacetamol;
+				toRet = availableLorazepam;
 				break;
 			case "aspirina":
 				toRet = availableAspirina;
@@ -567,6 +612,16 @@ public class HouseModel extends GridWorldModel {
 			case "doorBath2":
 				dest = lDoorBath2;
 				break;
+			case "doorHome":
+				dest = lDoorHome;
+				break;
+
+			case "cargadorRobot": 
+				dest = lCargadorRobot;                  
+				break; 
+			case "cargadorAuxiliar": 
+				dest = lCargadorAuxiliar;                  
+				break; 	
 		}
 		return dest;
 	}

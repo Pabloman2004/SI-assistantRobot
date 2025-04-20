@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class HouseEnv extends Environment {
 
 	// common literals
-	public static final String ARRAYAG[] = { "enfermera", "owner" }; //Array de agentes. Facilitará la gestión de estos cuando haya que añadir más.
+	public static final String ARRAYAG[] = { "enfermera", "owner", "auxiliar" }; //Array de agentes. Facilitará la gestión de estos cuando haya que añadir más.
 	public static final Literal of = Literal.parseLiteral("open(fridge)");
 	public static final Literal clf = Literal.parseLiteral("close(fridge)");
 	public static final Literal oc = Literal.parseLiteral("open(cabinet)");
@@ -51,7 +51,8 @@ public class HouseEnv extends Environment {
 
 	static Logger logger = Logger.getLogger(HouseEnv.class.getName());
 	private static Calendar calendar;
-
+	private static int bateriaRobot;
+	private static int bateriaAuxiliar;
 	HouseModel model; // the model of the grid
 	int lastDay;
 
@@ -59,6 +60,8 @@ public class HouseEnv extends Environment {
 	public void init(String[] args) {
 		model = new HouseModel();
 		calendar = new Calendar();
+		bateriaRobot = 100;
+		bateriaAuxiliar = 100;
 		lastDay = 0;
 		if (args.length == 1 && args[0].equals("gui")) {
 			HouseView view = new HouseView(model);
@@ -107,12 +110,14 @@ public class HouseEnv extends Environment {
 		// clear the percepts of the agents
 		clearPercepts("enfermera");
 		clearPercepts("owner");
+		clearPercepts("auxiliar");
 
 		updateAgentsPlace();
 		updateThingsPlace();
 
 		Location lRobot = model.getAgPos(0);
 		Location lOwner = model.getAgPos(1);
+		Location lAuxiliar = model.getAgPos(2);
 
 		for (int i = 0; i < ARRAYAG.length; i++) {
 			Location lAgent = model.getAgPos(i);
@@ -128,6 +133,19 @@ public class HouseEnv extends Environment {
 				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",robot)"));
 
 			}
+			if (lAgent.distance(lAuxiliar) < 2 && i!=2) {
+				addPercept(ARRAYAG[i],  Literal.parseLiteral("at("+ARRAYAG[i]+",auxiliar)"));
+				//System.out.println("[robot] is at owner.");	
+			}
+
+			if(lAgent.distanceEuclidean(model.lCargadorRobot) == 0){
+				addPercept(ARRAYAG[i],  Literal.parseLiteral("at("+ARRAYAG[i]+",cargadorRobot)"));
+			}
+
+			if(lAgent.distanceEuclidean(model.lCargadorAuxiliar) == 0){
+				addPercept(ARRAYAG[i],  Literal.parseLiteral("at("+ARRAYAG[i]+",cargadorAuxiliar)"));
+			}
+
 			if (lAgent.distance(model.lCabinet) < 2) {
 				for (int j = 0; j < ARRAYAG.length; j++) {
 					addPercept(ARRAYAG[j], Literal.parseLiteral("at(" + ARRAYAG[i] + ",cabinet)"));
@@ -265,12 +283,65 @@ public class HouseEnv extends Environment {
 		else if (action.getFunctor().equals("updatePercepts")) {
 			result = true;
 		}
+		else if (action.getFunctor().equals("addDrug") && ag.equals("auxiliar")) {
+			String drug = action.getTerm(0).toString();
+			int qtd=Integer.parseInt(action.getTerm(1).toString());
+			result=model.addDrug(drug,qtd);
+			model.setAuxiliarCargar(0);
+		}
+		else if (action.getFunctor().equals("cargar") && ag.equals("robot")) {
+
+			bateriaRobot+=1;
+			model.increaseBateriaRobot(agNum);
+			result = true;
+		}
+		else if (action.getFunctor().equals("cargar") && ag.equals("auxiliar")) {
+
+			bateriaAuxiliar+=1;
+			model.increaseBateriaRobot(agNum);
+			result = true; 
+		} 
+		else if (action.getFunctor().equals("setBateria") && ag.equals("owner")) {
+			String agente=action.getTerm(0).toString();
+			result = true; 
 		
+		}
+
+		else if (action.getFunctor().equals("getCost")) {
+			Location dest = model.getLocation(action.getTerm(0).toString());
+			Location cargador = agNum == 0 ? model.lCargadorRobot : model.lCargadorAuxiliar;
+			AStar path = new AStar(model, agNum, model.getAgPos(agNum), dest);
+			AStar pathCarga = new AStar(model, agNum, dest, cargador);
+			int costCarga = pathCarga.getCost();
+			int cost = (path.getCost());
+			int costeTotal = cost + costCarga;
+			if( (int)(costeTotal * 1.5) > model.getBateriaRobot(agNum) ){
+				result = false;
+			}else{
+				result =  true;
+			}
+	
+	
+}
 			
 		else {
 			logger.info("Failed to execute action " + action);
 		}
 		if (result) {
+			if(agNum==0 || agNum==2)
+			{
+				model.reduceBateriaRobot(agNum);
+				if(agNum == 0){
+					bateriaRobot-=1;
+					if(bateriaRobot%10 ==0)
+					System.out.println("Bateria enfermera: "+bateriaRobot);
+				}
+				if(agNum == 2){
+					bateriaAuxiliar-=1;
+					if(bateriaAuxiliar%10 ==0)
+					System.out.println("Bateria auxiliar: "+bateriaAuxiliar);
+				}
+			}
 			updatePercepts();
 			try {
 				Thread.sleep(200);

@@ -79,7 +79,8 @@ pauta_nueva(jarabe,20,12).
 	 }
    }.
 
-@day[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
+//@day[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
+//el atomic hace que el send al robot bo se ejecute y no se le cambien las pautas entonces
 +day(D)<-
    // 15% de probabilidad de cambiar las pautas 
    .random(X); // Genera un número aleatorio X

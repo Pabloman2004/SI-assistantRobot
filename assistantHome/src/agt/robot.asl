@@ -138,7 +138,7 @@ cantidad(amoxicilina,20).
 
 //Robot se da cuenta que el owner no ha tomado la medicina,(no trataremos que el owner lo mienta).
 -!comprobar(M,H)[source(self)]  <-
-	.print("No ha cogido",M,"!");
+	.print("No ha cogido ",M,"!");
 	close(cabinet).
 
 
