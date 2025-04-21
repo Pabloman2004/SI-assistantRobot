@@ -333,6 +333,7 @@ public class HouseEnv extends Environment {
 	
 	
 		}
+		/* no funciona
 		else if (action.getFunctor().equals("mostrarBateria")){
 			String mensaje = agNum == 0 
     			? "Batería enfermera: " + model.getBateriaRobot(agNum) 
@@ -341,6 +342,8 @@ public class HouseEnv extends Environment {
 			System.out.println(mensaje);
 			result = true;		
 		}
+		*/
+		
 			
 		else {
 			logger.info("Failed to execute action " + action);
@@ -349,6 +352,9 @@ public class HouseEnv extends Environment {
 			if(agNum==0 || agNum==2)
 			{
 				model.reduceBateriaRobot(agNum);
+				if(model.getBateriaRobot(agNum)%10  == 0){
+					System.out.println("Batería " + ARRAYAG[agNum] + ": " + model.getBateriaRobot(agNum));
+				}
 			}
 			updatePercepts();
 			try {
