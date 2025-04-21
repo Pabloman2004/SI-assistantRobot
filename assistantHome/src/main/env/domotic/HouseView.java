@@ -40,6 +40,7 @@ public class HouseView extends GridWorldView {
     public void draw(Graphics g, int x, int y, int object) {
         Location lRobot = hmodel.getAgPos(0);
 		Location lOwner = hmodel.getAgPos(1);
+		Location lAuxiliar = hmodel.getAgPos(2);
 		//Location lGuest = hmodel.getAgPos(2);
 		Location loc  	= new Location(x, y);
 		String objPath = currentDirectory;
@@ -112,7 +113,8 @@ public class HouseView extends GridWorldView {
 		case HouseModel.DOOR:
 			g.setColor(Color.lightGray);
 			if (lRobot.equals(loc) | lRobot.isNeigbour(loc) | 
-			lOwner.equals(loc) | lOwner.isNeigbour(loc)) {// | 
+			lOwner.equals(loc) | lOwner.isNeigbour(loc)
+			| lAuxiliar.equals(loc) | lAuxiliar.isNeigbour(loc)) {// | 
 				//lGuest.equals(loc) | lGuest.isNeigbour(loc)) {
 				objPath = "/doc/openDoor2.png";//currentDirectory.concat("/doc/openDoor2.png");
 				drawScaledImage(g, x, y, objPath, 75, 100);
@@ -165,10 +167,21 @@ public class HouseView extends GridWorldView {
 
 				
 				break;
-		}
+
+			case HouseModel.CARGADOR:
+			if((hmodel.getAgPos(0).equals(new Location(x,y))&& hmodel.getBateriaRobot(0)<199) || (hmodel.getAgPos(2).equals(new Location(x,y))&& hmodel.getBateriaRobot(2)<199))
+			{
+				objPath = "/doc/cargadorCargando.png";
+			}
+			else
+				objPath = "/doc/cargador.png";
+		
+		drawImage(g, x, y, objPath);
+		break;
         //repaint();
     }
-                          
+	}
+
     @Override
     public void drawAgent(Graphics g, int x, int y, Color c, int id) {
         Location lRobot = hmodel.getAgPos(0);

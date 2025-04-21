@@ -23,7 +23,7 @@ public class HouseModel extends GridWorldModel {
 	public static final int BED = 1024;
 	public static final int DELIVER = 2048;
 	public static final int CABINET = 4096;
-	public static final int RETRETE = 8192;
+	public static final int CARGADOR = 8192;
 	// the grid size
 	public static final int GSize = 12; // Cells
 	public static final int GridSize = 1080; // Width
@@ -57,7 +57,7 @@ public class HouseModel extends GridWorldModel {
 	public Location lChair3 = new Location(GSize / 2 - 1, GSize - 3);
 	public Location lChair2 = new Location(GSize / 2 + 1, GSize - 4);
 	public Location lChair4 = new Location(GSize / 2, GSize - 4);
-	public Location lDeliver = new Location(0, 10);
+	public Location lDeliver = new Location(0, GSize-1);
 	public Location lWasher = new Location(GSize / 2, 0);
 	public Location lFridge = new Location(3, 0);
 	public Location lTable = new Location(GSize / 2, GSize - 3);
@@ -66,7 +66,6 @@ public class HouseModel extends GridWorldModel {
 	public Location lBed3 = new Location(GSize * 2 - 3, 0);
 	public Location lBed1 = new Location(GSize + 1, GSize * 3 / 4);
 	public Location lCabinet = new Location(10, 0);
-	public Location lRetrete = new Location(23, 7);
 	public Location lCargadorRobot = new Location(8, 0);
 	public Location lCargadorAuxiliar = new Location(2,7);
 
@@ -190,11 +189,9 @@ public class HouseModel extends GridWorldModel {
 		add(BED, lBed1);
 		add(BED, lBed2);
 		add(BED, lBed3);
-		add(DELIVER, lDeliver);
 		add(CABINET, lCabinet);
-		add(RETRETE, lRetrete);
-		add(RETRETE, lCargadorAuxiliar);
-		add(RETRETE, lCargadorRobot);
+		add(CARGADOR, lCargadorAuxiliar);
+		add(CARGADOR, lCargadorRobot);
 		//add(VACIO,lVacio);
 
 		addWall(GSize / 2 + 1, 0, GSize / 2 + 1, GSize / 2 - 2);
@@ -226,6 +223,7 @@ public class HouseModel extends GridWorldModel {
         addWall(GSize + 2, GSize / 2, GSize * 2 - 1, GSize / 2);
         add(DOOR, lDoorBed3);
         add(DOOR, lDoorBath2);
+
 
 	}
 
