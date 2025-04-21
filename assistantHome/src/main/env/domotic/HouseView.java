@@ -174,7 +174,7 @@ public class HouseView extends GridWorldView {
 				objPath = "/doc/cargadorCargando.png";
 			}
 			else
-				objPath = "/doc/cargador.png";
+				objPath = "/doc/estacion.png";
 		
 		drawImage(g, x, y, objPath);
 		break;
@@ -186,6 +186,8 @@ public class HouseView extends GridWorldView {
     public void drawAgent(Graphics g, int x, int y, Color c, int id) {
         Location lRobot = hmodel.getAgPos(0);
         Location lOwner = hmodel.getAgPos(1);
+		Location lAuxiliar = hmodel.getAgPos(2);
+
 		//Location lGuest = hmodel.getAgPos(2);
 		String objPath = currentDirectory;
 

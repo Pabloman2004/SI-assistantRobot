@@ -19,7 +19,7 @@ cantidad(amoxicilina,20).
     
     .random([delivery,fridge,washer,cabinet],Y);
     .print("Voy a un sitio ",Y);
-    !go_at(enfermera,Y);
+    !comprobar_bateria_movimiento(Y);
     !simulate_behaviour.
 
 +!go_at(enfermera,P)[source(self)] : at(enfermera,P) <- .print("He llegado a ",P).
@@ -165,3 +165,32 @@ cantidad(amoxicilina,20).
    .abolish(cantidad(M,H));
    .print("Medicamento eliminado de la pauta: ",M).
 
++!cargar <-
+   .print("Voy a cargar");
+   !go_at(enfermera,cargadorRobot);
+   !cargando.
+
++!cargando :at(enfermera,cargadorRobot)<-
+   ?bateria(X);
+   if(X<199){
+      cargar;
+      .print("Estoy cargando.");
+      .wait(500);
+      !cargando;
+   }else{
+      .print("He acabado de cargar.")
+   }.
+-!cargando
+	<-.print("Ya no puedo cargar").
+
++!comprobar_bateria_movimiento(Destino)
+   <- getCost(Destino);
+   X = getCost(Destino);
+   print("El coste es ",X);
+      .print("Tengo bateria suficiente, puedo ir");
+      !go_at(enfermera,Destino).
+
+-!comprobar_bateria_movimiento(Destino)
+   <- .print("No tengo bateria suficiente, voy a cargar");
+      !cargar;
+      !go_at(enfermera,Destino).

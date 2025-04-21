@@ -60,8 +60,8 @@ public class HouseEnv extends Environment {
 	public void init(String[] args) {
 		model = new HouseModel();
 		calendar = new Calendar();
-		bateriaRobot = 100;
-		bateriaAuxiliar = 100;
+		bateriaRobot = 200;
+		bateriaAuxiliar = 200;
 		lastDay = 0;
 		if (args.length == 1 && args[0].equals("gui")) {
 			HouseView view = new HouseView(model);
@@ -191,6 +191,10 @@ public class HouseEnv extends Environment {
 
 		for (int i = 0; i < ARRAYAG.length; i++) {
 			addPercept(ARRAYAG[i], Literal.parseLiteral("hour(" + calendar.getHora() + ")"));
+			if(i==0 || i==2)
+			{
+				addPercept(ARRAYAG[i],Literal.parseLiteral("bateria("+model.getBateriaRobot(i)+")"));
+			}
 		}
 
 		for (int i = 0; i < model.getOwnerDrugs().size(); i++) {
@@ -207,6 +211,8 @@ public class HouseEnv extends Environment {
 				}
 			this.lastDay = calendar.getDia();	
 		}
+
+
 
 	}
 
