@@ -295,7 +295,7 @@ public class HouseEnv extends Environment {
 			result=model.addDrug(drug,qtd);
 			model.setAuxiliarCargar(0);
 		}
-		else if (action.getFunctor().equals("cargar") && ag.equals("robot")) {
+		else if (action.getFunctor().equals("cargar") && ag.equals("enfermera")) {
 
 			bateriaRobot+=1;
 			model.increaseBateriaRobot(agNum);
@@ -307,11 +307,12 @@ public class HouseEnv extends Environment {
 			model.increaseBateriaRobot(agNum);
 			result = true; 
 		} 
-		else if (action.getFunctor().equals("setBateria") && ag.equals("owner")) {
-			String agente=action.getTerm(0).toString();
-			result = true; 
+		//else if (action.getFunctor().equals("setBateria") && ag.equals("owner")) {
+		//	String agente=action.getTerm(0).toString();
+		//	model.setBateriaRobot(agente,200);
+		//	result = true; 
 		
-		}
+		//}
 
 		else if (action.getFunctor().equals("getCost")) {
 			Location dest = model.getLocation(action.getTerm(0).toString());

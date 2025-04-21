@@ -138,12 +138,9 @@ public class HouseModel extends GridWorldModel {
 	{
 		return bateriaRobots.get(i);
 	}
-	public void setBateriaRobot(String ag,int valor)
+	public void setBateriaRobot(int i, int valor)
 	{
-		if(ag.equals("robot"))
-			bateriaRobots.set(0,valor);
-		else if(ag.equals("auxiliar"))
-			bateriaRobots.set(2,valor);
+		bateriaRobots.set(i,valor);
 	}
 	public void reduceBateriaRobot(int i)
 	{
@@ -160,9 +157,12 @@ public class HouseModel extends GridWorldModel {
 		// create a GSize x 2GSize grid with 3 mobile agent
 		super(2 * GSize, GSize, 3);
 		bateriaRobots=new ArrayList<>();
+		
+		//mirar porque si pongo estrictamente menor no funciona.
 		for(int i=0;i<=2;i++)
 		{
-			bateriaRobots.add(0);
+			bateriaRobots.add(i);
+			bateriaRobots.set(i,100);
 		}
 		// initial location of robot (column 3, line 3)
 		// ag code 0 means the robot
