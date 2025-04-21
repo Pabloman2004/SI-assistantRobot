@@ -60,8 +60,8 @@ public class HouseEnv extends Environment {
 	public void init(String[] args) {
 		model = new HouseModel();
 		calendar = new Calendar();
-		bateriaRobot = 200;
-		bateriaAuxiliar = 200;
+		bateriaRobot = 100;
+		bateriaAuxiliar = 100;
 		lastDay = 0;
 		if (args.length == 1 && args[0].equals("gui")) {
 			HouseView view = new HouseView(model);
@@ -322,14 +322,25 @@ public class HouseEnv extends Environment {
 			int costCarga = pathCarga.getCost();
 			int cost = (path.getCost());
 			int costeTotal = cost + costCarga;
+			System.out.println("Coste total: " + costeTotal);
 			if( (int)(costeTotal * 1.5) > model.getBateriaRobot(agNum) ){
 				result = false;
 			}else{
 				result =  true;
 			}
+
+		
 	
 	
-}
+		}
+		else if (action.getFunctor().equals("mostrarBateria")){
+			String mensaje = agNum == 0 
+    			? "Batería enfermera: " + model.getBateriaRobot(agNum) 
+    			: "Batería auxiliar: " + model.getBateriaRobot(agNum);
+
+			System.out.println(mensaje);
+			result = true;		
+		}
 			
 		else {
 			logger.info("Failed to execute action " + action);
@@ -338,16 +349,6 @@ public class HouseEnv extends Environment {
 			if(agNum==0 || agNum==2)
 			{
 				model.reduceBateriaRobot(agNum);
-				if(agNum == 0){
-					bateriaRobot-=1;
-					if(bateriaRobot%10 ==0)
-					System.out.println("Bateria enfermera: "+bateriaRobot);
-				}
-				if(agNum == 2){
-					bateriaAuxiliar-=1;
-					if(bateriaAuxiliar%10 ==0)
-					System.out.println("Bateria auxiliar: "+bateriaAuxiliar);
-				}
 			}
 			updatePercepts();
 			try {

@@ -186,8 +186,9 @@ cantidad(amoxicilina,20).
 
 +!comprobar_bateria_movimiento(Destino)
    <- getCost(Destino);
-
-      .print("Tengo bateria suficiente, puedo ir");
+      // una vez
+      .print("Tengo bateria suficiente, puedo ir ");
+      //mostrar_bateria;
       !go_at(enfermera,Destino).
 
 -!comprobar_bateria_movimiento(Destino)
