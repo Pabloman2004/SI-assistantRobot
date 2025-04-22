@@ -25,7 +25,7 @@ pauta(paracetamol,8,6).
 pauta(ibuprofeno,12,6).
 pauta(lorazepam,22,23).
 pauta(aspirina,1,2).
-pauta(amoxicilina,15,2).
+//pauta(amoxicilina,15,2).
 
 pauta_nueva(brainal,20,12).
 pauta_nueva(benadryl,20,12).

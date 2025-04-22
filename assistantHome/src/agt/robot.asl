@@ -9,6 +9,8 @@ cantidad(aspirina,20).
 cantidad(lorazepam,20).
 cantidad(amoxicilina,20).
 
+cargaRapida(3).
+
 //Owner le indica al robot la nueva pauta de medicinas.
 
 !simulate_behaviour.   
@@ -28,7 +30,7 @@ cantidad(amoxicilina,20).
      !go_at(enfermera,P).
 -!go_at(enfermera,P)[source(self)]<- apartar;.wait(5);!go_at(enfermera,P).
 @sinBateria[atomic]
--!go_at(robot,P)[source(self)]:bateria(X) & X>=0<-.print("No tengo bateria").
+-!go_at(enfermera,P)[source(self)]:bateria(X) & X>=0<-.print("No tengo bateria").
 
 //no se modicifica ya que se comprueba la bateria en entregarMedicina
 +hour(H)<-
@@ -172,11 +174,11 @@ cantidad(amoxicilina,20).
 
 +!cargando :at(enfermera,cargadorRobot)<-
    ?bateria(X);
-   if(X<99){
+   if(X<287){
       cargar;
       .print("Estoy cargando. ",X);
       
-      .wait(500);
+      .wait(517);
       !cargando;
    }else{
       .print("He acabado de cargar.")

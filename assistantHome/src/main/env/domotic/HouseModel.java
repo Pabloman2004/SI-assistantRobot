@@ -154,8 +154,11 @@ public class HouseModel extends GridWorldModel {
 
 	public void increaseBateriaRobot(int i)
 	{
-		if(bateriaRobots.get(i)>0)
-			bateriaRobots.set(i,bateriaRobots.get(i)+10 >= 200 ? 200 : bateriaRobots.get(i)+10);
+		int current = bateriaRobots.get(i);
+		int maxBattery = 288;
+		if (current < maxBattery) {
+    		bateriaRobots.set(i, Math.min(current + 10, maxBattery));
+		}
 	}
 	public HouseModel() {
 		// create a GSize x 2GSize grid with 3 mobile agent
