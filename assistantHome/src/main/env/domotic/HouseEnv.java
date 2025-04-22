@@ -60,8 +60,10 @@ public class HouseEnv extends Environment {
 	public void init(String[] args) {
 		model = new HouseModel();
 		calendar = new Calendar();
-		bateriaRobot = 100;
-		bateriaAuxiliar = 100;
+		bateriaRobot = model.getGsize() * model.getGsize() * 2;
+		bateriaAuxiliar = model.getGsize() * model.getGsize() * 2;
+		model.setBateriaRobot(0,model.getGsize() * model.getGsize() * 2); // numero de celdas 12 e alto (Gsize) 24 de ancho
+		model.setBateriaRobot(2,model.getGsize() * model.getGsize() * 2);
 		lastDay = 0;
 		if (args.length == 1 && args[0].equals("gui")) {
 			HouseView view = new HouseView(model);
@@ -140,10 +142,6 @@ public class HouseEnv extends Environment {
 
 			if(lAgent.distanceEuclidean(model.lCargadorRobot) == 0){
 				addPercept(ARRAYAG[i],  Literal.parseLiteral("at("+ARRAYAG[i]+",cargadorRobot)"));
-			}
-
-			if(lAgent.distanceEuclidean(model.lCargadorAuxiliar) == 0){
-				addPercept(ARRAYAG[i],  Literal.parseLiteral("at("+ARRAYAG[i]+",cargadorAuxiliar)"));
 			}
 
 			if (lAgent.distance(model.lCabinet) < 2) {
@@ -316,7 +314,7 @@ public class HouseEnv extends Environment {
 
 		else if (action.getFunctor().equals("getCost")) {
 			Location dest = model.getLocation(action.getTerm(0).toString());
-			Location cargador = agNum == 0 ? model.lCargadorRobot : model.lCargadorAuxiliar;
+			Location cargador =  model.lCargadorRobot;
 			AStar path = new AStar(model, agNum, model.getAgPos(agNum), dest);
 			AStar pathCarga = new AStar(model, agNum, dest, cargador);
 			int costCarga = pathCarga.getCost();

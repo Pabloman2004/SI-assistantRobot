@@ -67,7 +67,7 @@ public class HouseModel extends GridWorldModel {
 	public Location lBed1 = new Location(GSize + 1, GSize * 3 / 4);
 	public Location lCabinet = new Location(10, 0);
 	public Location lCargadorRobot = new Location(8, 0);
-	public Location lCargadorAuxiliar = new Location(2,7);
+
 
 	// Initialization of the doors location on the domotic home scene
 	public Location lDoorHome = new Location(0, GSize - 1);
@@ -98,6 +98,10 @@ public class HouseModel extends GridWorldModel {
 	 * Crear un método para la identificación del tipo de agente existente
 	 * Identificar objetos globales que precisen de un único identificador
 	 */
+	public int getGsize(){
+		return GSize;
+	}
+	
 	public List<String> getOwnerDrugs()
 	{
 		return ownerDrugs;
@@ -162,7 +166,7 @@ public class HouseModel extends GridWorldModel {
 		for(int i=0;i<=2;i++)
 		{
 			bateriaRobots.add(i);
-			bateriaRobots.set(i,100);
+			//bateriaRobots.set(i,100);
 		}
 		// initial location of robot (column 3, line 3)
 		// ag code 0 means the robot
@@ -190,7 +194,6 @@ public class HouseModel extends GridWorldModel {
 		add(BED, lBed2);
 		add(BED, lBed3);
 		add(CABINET, lCabinet);
-		add(CARGADOR, lCargadorAuxiliar);
 		add(CARGADOR, lCargadorRobot);
 		//add(VACIO,lVacio);
 
@@ -617,9 +620,6 @@ public class HouseModel extends GridWorldModel {
 			case "cargadorRobot": 
 				dest = lCargadorRobot;                  
 				break; 
-			case "cargadorAuxiliar": 
-				dest = lCargadorAuxiliar;                  
-				break; 	
 		}
 		return dest;
 	}
