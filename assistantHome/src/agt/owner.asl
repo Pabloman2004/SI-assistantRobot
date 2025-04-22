@@ -84,7 +84,7 @@ pauta_nueva(jarabe,20,12).
 +day(D)<-
    // 15% de probabilidad de cambiar las pautas 
    .random(X); // Genera un número aleatorio X
-   if( X < 0.01){
+   if( X < 0.1){
    .print("Añadiendo medicamento a la pauta");
    .findall(pauta_nueva(M,H,F),pauta_nueva(M,H,F),L);
    .random(L,Nuevo); //se escoge un medicamento aleatorio de la lista de medicamentos nuevos
@@ -104,7 +104,7 @@ pauta_nueva(jarabe,20,12).
       
    }
    
-   elif( X < 0.9) { // 20% de posibilidad de cambiar las pautas
+   elif( X < 0.2) { // 20% de posibilidad de cambiar las pautas
    .findall(pauta(M, H, F), .belief(pauta(M, H, F)), L); // Encuentra todas las pautas
 
       if (not L == []) {

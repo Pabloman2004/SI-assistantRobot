@@ -51,25 +51,22 @@ public class HouseEnv extends Environment {
 
 	static Logger logger = Logger.getLogger(HouseEnv.class.getName());
 	private static Calendar calendar;
-	private static int bateriaRobot;
-	private static int bateriaAuxiliar;
+	private static int maximaBateria;
 	HouseModel model; // the model of the grid
 	int lastDay;
 
 	@Override
 	public void init(String[] args) {
 		model = new HouseModel();
-		calendar = new Calendar();
-		bateriaRobot = model.getGsize() * model.getGsize() * 2;
-		bateriaAuxiliar = model.getGsize() * model.getGsize() * 2;
+		calendar = new Calendar();	
 		model.setBateriaRobot(0,model.getGsize() * model.getGsize() * 2); // numero de celdas 12 e alto (Gsize) 24 de ancho
 		model.setBateriaRobot(2,model.getGsize() * model.getGsize() * 2);
+		maximaBateria = model.getBateriaRobot(0);
 		lastDay = 0;
 		if (args.length == 1 && args[0].equals("gui")) {
 			HouseView view = new HouseView(model);
 			model.setView(view);
 		}
-
 		updatePercepts();
 	}
 
@@ -121,6 +118,7 @@ public class HouseEnv extends Environment {
 		Location lOwner = model.getAgPos(1);
 		Location lAuxiliar = model.getAgPos(2);
 
+		
 		for (int i = 0; i < ARRAYAG.length; i++) {
 			Location lAgent = model.getAgPos(i);
 			if (lAgent.distance(model.lFridge) < 2) {
@@ -210,6 +208,15 @@ public class HouseEnv extends Environment {
 			this.lastDay = calendar.getDia();	
 		}
 
+		for (int i = 0; i < ARRAYAG.length; i++) {
+			if (i==0 ) {
+				addPercept("enfermera", Literal.parseLiteral("cargaMaxima(" + maximaBateria + ")"));
+			}
+			else if (i==2) {
+				addPercept("auxiliar", Literal.parseLiteral("cargaMaxima(" + maximaBateria + ")"));
+			}
+		}
+
 
 
 	}
@@ -295,13 +302,11 @@ public class HouseEnv extends Environment {
 		}
 		else if (action.getFunctor().equals("cargar") && ag.equals("enfermera")) {
 
-			bateriaRobot+=1;
 			model.increaseBateriaRobot(agNum);
 			result = true;
 		}
 		else if (action.getFunctor().equals("cargar") && ag.equals("auxiliar")) {
 
-			bateriaAuxiliar+=1;
 			model.increaseBateriaRobot(agNum);
 			result = true; 
 		} 
@@ -312,6 +317,12 @@ public class HouseEnv extends Environment {
 		
 		//}
 
+		else if (action.getFunctor().equals("cargaRapidaEnv") && ag.equals("enfermera")) {
+			model.setBateriaRobot(agNum, (int)(maximaBateria*0.95));
+			maximaBateria = (int)(maximaBateria*0.95);
+			result = true; 
+		} 
+
 		else if (action.getFunctor().equals("getCost")) {
 			Location dest = model.getLocation(action.getTerm(0).toString());
 			Location cargador =  model.lCargadorRobot;
@@ -320,7 +331,6 @@ public class HouseEnv extends Environment {
 			int costCarga = pathCarga.getCost();
 			int cost = (path.getCost());
 			int costeTotal = cost + costCarga;
-			System.out.println("Coste total: " + costeTotal);
 			if( (int)(costeTotal * 1.5) > model.getBateriaRobot(agNum) ){
 				result = false;
 			}else{

@@ -156,7 +156,6 @@ cargaRapida(3).
 
 +aparta[source(owner)] <- .print("Debo de apartarme");-aparta.
 
-
 +delivered(drug, _Qtd, _OrderId)[source(repartidor)]
   :  true
   <- +delivered;
@@ -170,11 +169,30 @@ cargaRapida(3).
 +!cargar <-
    .print("Voy a cargar");
    !go_at(enfermera,cargadorRobot);
+   .random(X);
+   if(X<0.9){
+      !cargaRapida;
+   }  
    !cargando.
 
-+!cargando :at(enfermera,cargadorRobot)<-
++!cargaRapida[source(self)] : at(enfermera,cargadorRobot) & cargaRapida(X)<- 
+   .print("Carga rapida");
+   if(X>0){
+      .print("La carga rapida se puede llevar a cabo");
+      .abolish(cargaRapida(X));
+      +cargaRapida(X-1);
+      cargaRapidaEnv;
+      .print("Carga rapida realizada");
+   }
+   else{
+      .print("No se puede llevar a cabo la carga rapida");
+      !cargando;
+   }.
+
+   +!cargando :at(enfermera,cargadorRobot)<-
    ?bateria(X);
-   if(X<287){
+   ?cargaMaxima(Y);//creencia que pasamos desde el Env
+   if(X<Y){
       cargar;
       .print("Estoy cargando. ",X);
       
@@ -189,7 +207,6 @@ cargaRapida(3).
 +!comprobar_bateria_movimiento(Destino)
    <- getCost(Destino);
       // una vez
-      .print("Tengo bateria suficiente, puedo ir ");
       //mostrar_bateria;
       !go_at(enfermera,Destino).
 

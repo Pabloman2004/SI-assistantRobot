@@ -33,7 +33,7 @@ public class Calendar {
             this.hora = 0;
             this.dia = this.dia.plusDays(1); // Incrementa el día this.dia.plusDays(1);
         }
-        if(this.hora == 1) {
+        if(this.hora == 0) {
             System.out.println("Día actual: " + this.dia); // Muestra el día actualizado
         }
         System.out.println("Hora actual: " + this.hora); // Muestra la hora actualizada
