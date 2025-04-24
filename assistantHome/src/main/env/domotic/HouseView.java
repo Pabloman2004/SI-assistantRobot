@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 
 import javax.swing.ImageIcon;
 
+import java.util.Map;
 
 
 
@@ -162,10 +163,35 @@ public class HouseView extends GridWorldView {
 					drawImage(g, x, y, objPath);
 					g.setColor(Color.blue);
 				}
-				drawString(g, x, y, defaultFont, "PA (" + hmodel.getAvailableParacetamol() + ")" + "IB (" + hmodel.getAvailableIbuprofeno() + ")" + "LO (" + hmodel.getAvailableLorazepam() + ")");
-				drawString(g, x, y + 1, defaultFont, "AS (" + hmodel.getAvailableAspirina() + ")" + "AM (" + hmodel.getAvailableAmoxicilina() + ")");
 
-				
+				int cont = 0;
+				int contY = 0;
+				int contX = -1;
+				for (Map.Entry<String, Integer> entry : hmodel.medicamentos.entrySet()) {
+					String medicamento = entry.getKey(); // Esto será el nombre del medicamento (o el ID, lo que uses como clave)
+					
+					if(cont<3){
+						drawString(g, x+contX, y, defaultFont, medicamento.substring(0,2) +" (" + hmodel.getAvailableMedicamento(medicamento) + ")");
+						contX++;
+						if(cont == 2){
+							contY++;
+							contX = -1;
+						}
+					}	
+					else if(cont<6){
+						drawString(g, x+ contX, y + contY, defaultFont, medicamento.substring(0,2) +" (" + hmodel.getAvailableMedicamento(medicamento) + ")");
+						contX++;
+						if(cont == 5){
+							contY++;
+							contX = 0;
+						}
+					}
+					else{
+						drawString(g, x + contX, y + contY, defaultFont, medicamento.substring(0,2) +" (" + hmodel.getAvailableMedicamento(medicamento) + ")");
+					}
+					cont++;
+				}
+					
 				break;
 
 			case HouseModel.CARGADOR:

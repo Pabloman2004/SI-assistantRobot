@@ -323,6 +323,14 @@ public class HouseEnv extends Environment {
 			result = true; 
 		} 
 
+		else if (action.getFunctor().equals("setMedicamento") && ag.equals("owner")) {
+			String drug = action.getTerm(0).toString();
+			model.setMedicamentos(drug,20);//inicilizamos cada medicamento a 20
+			model.setDeliveredMedicamentos(drug,0);//inicializamos el contador de medicamentos entregados a 0
+			System.out.println("Medicamento " + drug + " añadido al cabinet.");
+			result = true;
+		} 
+
 		else if (action.getFunctor().equals("getCost")) {
 			Location dest = model.getLocation(action.getTerm(0).toString());
 			Location cargador =  model.lCargadorRobot;

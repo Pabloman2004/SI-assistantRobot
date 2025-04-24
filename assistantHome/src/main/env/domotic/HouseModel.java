@@ -5,6 +5,7 @@ import jason.environment.grid.Area;
 import jason.environment.grid.Location;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 //import jason.asSyntax.*;
 
 /** class that implements the Model of Domestic Robot application */
@@ -34,17 +35,14 @@ public class HouseModel extends GridWorldModel {
 
 	private ArrayList<String> ownerDrugs = new ArrayList<>();
 
-	private int availableParacetamol = 20;
-	private int availableIbuprofeno = 20;
-	private int availableLorazepam = 20;
-	private int availableAspirina = 20;
-	private int availableAmoxicilina = 20;
+	HashMap<String, Integer> medicamentos = new HashMap<>();
+	HashMap<String, Integer> deliveredMedicamentos = new HashMap<>();
 
-	private int deliveredParacetamol = 0;
+	/*private int deliveredParacetamol = 0;
 	private int deliveredIbuprofeno = 0;
 	private int deliveredLorazepam = 0;
 	private int deliveredAspirina = 0;
-	private int deliveredAmoxicilina = 0;
+	private int deliveredAmoxicilina = 0;*/
 	
 	private int ownerMove=0;
 	private int auxiliarCargar=0;
@@ -106,13 +104,14 @@ public class HouseModel extends GridWorldModel {
 	{
 		return ownerDrugs;
 	}
-	public int getAvailableParacetamol()
-	{
-		return availableParacetamol;
-	}
+
 	public int getCarryingDrugs()
 	{
 		return carryingDrugs;
+	}
+	/*	public int getAvailableParacetamol()
+	{
+		return availableParacetamol;
 	}
 	public int getAvailableIbuprofeno()
 	{
@@ -129,6 +128,19 @@ public class HouseModel extends GridWorldModel {
 	public int getAvailableAmoxicilina()
 	{
 		return availableAmoxicilina;
+	}*/
+	
+	public int getAvailableMedicamento(String drug) {		
+		return medicamentos.get(drug);
+	}
+
+	public void setMedicamentos(String medicamento, int valor)
+	{
+		medicamentos.put(medicamento, valor);
+	}
+	public void setDeliveredMedicamentos(String medicamento, int valor)
+	{
+		deliveredMedicamentos.put(medicamento, valor);
 	}
 	public int getAuxiliarCargar()
 	{
@@ -149,7 +161,8 @@ public class HouseModel extends GridWorldModel {
 	public void reduceBateriaRobot(int i)
 	{
 		if(bateriaRobots.get(i)>0)
-			bateriaRobots.set(i,bateriaRobots.get(i)-1);			
+			bateriaRobots.set(i,bateriaRobots.get(i)-1);		
+			
 	}
 
 	public void increaseBateriaRobot(int i)
@@ -395,32 +408,9 @@ public class HouseModel extends GridWorldModel {
 		return dirs.size() > 0;
 	}
 
-	int getAvailableDrug(String drug) {
-		int toRet = 0;
-		switch (drug) {
-			case "paracetamol":
-				toRet = availableParacetamol;
-				break;
-			case "ibuprofeno":
-				toRet = availableIbuprofeno;
-				break;
-			case "lorazepam":
-				toRet = availableLorazepam;
-				break;
-			case "aspirina":
-				toRet = availableAspirina;
-				break;
-			case "amoxicilina":
-				toRet = availableAmoxicilina;
-				break;
-			default:
-				break;
-		}
-		return toRet;
-	}
 
 	public void reduceAvailableDrug(String drug) {
-		switch (drug) {
+		/*switch (drug) {
 			case "paracetamol":
 				availableParacetamol--;
 				if(availableParacetamol <= 0) {
@@ -458,12 +448,14 @@ public class HouseModel extends GridWorldModel {
 				break;
 			default:
 				break;
-		}
+		}*/
+		medicamentos.put(drug, medicamentos.get(drug)-1);
+		System.out.println("Medicina " + drug + " cantidad: " + medicamentos.get(drug));
 	}
 
 	public boolean takeDrug(int ag, String drug) {
 		if (ag == 0) {// la coge la enfermera
-			if (cabinetOpen && getAvailableDrug(drug) > 0) {
+			if (cabinetOpen && getAvailableMedicamento(drug) > 0) {
 				reduceAvailableDrug(drug);
 				carryingDrugs++;
 				return true;
@@ -472,7 +464,7 @@ public class HouseModel extends GridWorldModel {
 					System.out.println("The cabinet is opened. ");
 				}
 				;
-				if (getAvailableDrug(drug) > 0) {
+				if (getAvailableMedicamento(drug) > 0) {
 					System.out.println("The cabinet has enough drug. ");
 				}
 				;
@@ -483,7 +475,7 @@ public class HouseModel extends GridWorldModel {
 				return false;
 			}
 		} else {// la coge el owner
-			if (getAvailableDrug(drug) > 0) {
+			if (getAvailableMedicamento(drug) > 0) {
 				reduceAvailableDrug(drug);
 				return true;
 			} else {
@@ -491,7 +483,7 @@ public class HouseModel extends GridWorldModel {
 					System.out.println("The cabinet is opened. ");
 				}
 				;
-				if (getAvailableDrug(drug) > 0) {
+				if (getAvailableMedicamento(drug) > 0) {
 					System.out.println("The fridge has enough drug. ");
 				}
 				;
@@ -502,7 +494,7 @@ public class HouseModel extends GridWorldModel {
 	}
 
 	public boolean addDrug(String drug, int qtd) {
-		switch (drug) {
+		/*switch (drug) {
 			case "paracetamol":
 				availableParacetamol = qtd;
 				break;
@@ -520,7 +512,8 @@ public class HouseModel extends GridWorldModel {
 				break;
 			default:
 				break;
-		}
+		}*/
+		medicamentos.put(drug, qtd);
 		return true;
 	}
 
@@ -538,7 +531,7 @@ public class HouseModel extends GridWorldModel {
 	}
 
 	public boolean comprobarConsumo(String drug, int num){
-		return getAvailableDrug(drug) == num - 1;
+		return getAvailableMedicamento(drug) == num - 1;
 	}
 
 	public Location getLocation(String loc) {
@@ -633,7 +626,7 @@ public class HouseModel extends GridWorldModel {
 
 
 	public boolean deliver(String drug, int qtd) {
-		switch (drug) {
+		/*switch (drug) {
 			case "paracetamol":
 				deliveredParacetamol += qtd;
 				break;
@@ -651,12 +644,13 @@ public class HouseModel extends GridWorldModel {
 				break;
 			default:
 				break;
-		}
+		}*/
+		deliveredMedicamentos.put(drug, deliveredMedicamentos.get(drug) + qtd);
 		return true;
 	}
 
 	public boolean getDelivery(String drug) {
-		switch (drug) {
+		/*switch (drug) {
 			case "paracetamol":
 				deliveredParacetamol = 0;
 				break;
@@ -674,7 +668,8 @@ public class HouseModel extends GridWorldModel {
 				break;
 			default:
 				break;
-		}
+		}*/
+		deliveredMedicamentos.put(drug, 0);
 		return true;
 	}
 

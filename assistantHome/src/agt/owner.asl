@@ -31,6 +31,13 @@ pauta_nueva(brainal,20,12).
 pauta_nueva(benadryl,20,12).
 pauta_nueva(jarabe,20,12).
 
+!pasarMedicamentoEnv.
+@pasarMedicamentoEnv[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
++!pasarMedicamentoEnv[source(self)]  <-
+   .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+   for(.member(pauta(M, H, F), L)) {
+         setMedicamento(M);
+      }.
 
 +pauta(M,H,F)[source(robot)] <- .abolish(pauta(M,H-F,_)).
 +!pauta_medicamentos 
@@ -70,7 +77,7 @@ pauta_nueva(jarabe,20,12).
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
       if(not L == []){
       if(not .intend(tomarMedicina(L)) & not quieto){
-		.print("Voy a por medicinas ");
+		.print("Es hora de la medicina");
       !tomarMedicina(L);
       }
      }
@@ -98,6 +105,8 @@ pauta_nueva(jarabe,20,12).
          .send(self, tell, pauta(M,H,F)); // se manda a si mismo la creencia de la nueva pauta
          .send(enfermera, tell, pauta(M,H,F)); // le manda al robot la nueva pauta
          !mostrarPautaActual;
+         //si añadimos un medicamento llamamos al metodo que le pasa los medicamentos al .java
+         setMedicamento(M); 
       }
       
       
@@ -118,6 +127,7 @@ pauta_nueva(jarabe,20,12).
                .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
                .send(self,tell,pauta_nueva(M,H,F)); // la pauta eliminada pasa a ser una pauta que en un futuro se puede añadir a la base de conocimiento
             }
+            !pasarMedicamentoEnv;
             !mostrarPautaActual;
             }
          else {
@@ -128,7 +138,8 @@ pauta_nueva(jarabe,20,12).
 }.
 
 
-+!curado <- .print("Paciente curado").
++!curado <- .print("Paciente sano").
+
 +!mostrarPautaActual <- .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
    .print("Pautas actuales: ",L).
 
