@@ -191,6 +191,7 @@ public class HouseEnv extends Environment {
 			{
 				addPercept(ARRAYAG[i],Literal.parseLiteral("bateria("+model.getBateriaRobot(i)+")"));
 			}
+
 		}
 
 		for (int i = 0; i < model.getOwnerDrugs().size(); i++) {
@@ -217,7 +218,15 @@ public class HouseEnv extends Environment {
 			}
 		}
 
-
+		for (int i = 0; i < ARRAYAG.length; i++) {
+			if (i==0 || i == 2) {
+				for (String medicamento : model.medicamentos.keySet()) {
+					addPercept("enfermera", Literal.parseLiteral("cantidad(" + medicamento +","+ model.getAvailableMedicamento(medicamento)+ ")"));
+					addPercept("auxiliar", Literal.parseLiteral("cantidad(" + medicamento + "," + model.getAvailableMedicamento(medicamento)+ ")"));
+				}
+				
+			}
+		}
 
 	}
 

@@ -3,11 +3,11 @@
 // initially, robot is free
 free.
 
-cantidad(paracetamol,20).
-cantidad(ibuprofeno,20).
-cantidad(aspirina,20).
-cantidad(lorazepam,20).
-cantidad(amoxicilina,20).
+//cantidad(paracetamol,20).
+//cantidad(ibuprofeno,20).
+//cantidad(aspirina,20).
+//cantidad(lorazepam,20).
+//cantidad(amoxicilina,20).
 
 cargaRapida(3).
 
