@@ -33,7 +33,9 @@ cargaRapida(3).
 -!go_at(enfermera,P)[source(self)]:bateria(X) & X>=0<-.print("No tengo bateria").
 
 //no se modicifica ya que se comprueba la bateria en entregarMedicina
-+hour(H)<-
+//esto esta mal, porque si lo hago de esta forma el robot siempre entrega la medicina,
+//es mejor que el owner le diga al robot que la entregue, y el robot compruebe si tiene bateria o no.
+/*+hour(H)<-
 	.findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
      if(not L == []){
       if(not .intend(entregarMedicina(L))){
@@ -41,13 +43,12 @@ cargaRapida(3).
          !entregarMedicina(L);
       }
      }.
-
+*/
 //hay que modificarlo para tener en cuenta la bateria
-+!entregarMedicina(L)[source(self)]<-
-	.abolish(disponibilidad);
-		//if(.intend(simulate_behaviour)){
-			//.drop_intention(simulate_behaviour);
-		//}
++!entregarMedicina(L)[source(owner)]<-
+		if(.intend(simulate_behaviour)){
+			.drop_intention(simulate_behaviour);
+		}
 		.print("Las entrego yo");
 		!bring(owner,L).
 		//!simulate_behaviour;
@@ -67,19 +68,18 @@ cargaRapida(3).
    +pauta(M,Y,F);
    .send(owner,tell,pauta(M,Y,F)).
 //Robot modifica su conocimiento de la cantidad que hab�a de un medicamento dado.
-+!reducirCantidad(M)[source(self)] : cantidad(M,H) <- .abolish(cantidad(M,H)); +cantidad(M,H-1).
+
 
 //modificar para comprobar bateria
 @medicina[atomic]
 +!bring(owner,L)[source(self)]
    <- 
-      if(not at(owner,cabinet) & not .belief(comprobarConsumo(_))){
+      if(not .belief(comprobarConsumo(_))){
          .send(owner, tell, quieto);
          open(cabinet);
          for(.member(pauta(M,H,F),L))
          {
             takeDrug(enfermera,M);
-            !reducirCantidad(M);
             !go_at(enfermera,cabinet);
             .print("He cogido ", M);
          };
@@ -93,6 +93,7 @@ cargaRapida(3).
 			!resetearPauta(M);
          }
          .send(owner, untell, quieto);
+         !simulate_behaviour;
       }else{
 	  	.wait(2000);
          .findall(M,.belief(comprobarConsumo(M)),X);
@@ -110,48 +111,44 @@ cargaRapida(3).
 		 .send(owner,tell,espera);
          for(.member(pauta(M,H,F),L))
          {
-		 	!reducirCantidad(M);
 		 	.print("Le he dado ", M);
             handDrug(M);
 			!resetearPauta(M);
          }.
 
 //no se modifica
-@comprueba[atomic]
-+!comprueba(L)<-
-		 .findall(M,.belief(comprobarConsumo(M)),X);
-         for(.member(M,X)){
+
++!comprueba(M,L)[source(owner)]<-
 		 	.print("Compruebo el consumo de ",M);
-            !comprobarConsumo(M)
-		 }.
+         !comprobarConsumo(M,L).
 
 // no se modifica
-+!comprobarConsumo(M)[source(self)] : cantidad(M,H) <- 
+@comprobarConsumo[atomic]
++!comprobarConsumo(M,L)[source(self)] : cantidad(M,H) <- 
    .drop_intention(simulate_behaviour);//deja de hacer lo que estaba haciendo
-   !go_at(enfermera,cabinet);
-   open(cabinet);
-	!comprobar(M,H);
-   close(cabinet).
-
-//si le manda el owner el mensaje de que ha tomado la medicina, el robot lo comprueba.
-+comprobarConsumo(M)[source(owner)] : cantidad(M,H)<- 
    .print("Comprobando consumo ",M);
    !go_at(enfermera,cabinet);
    open(cabinet);
-   !comprobar(M,H);
+	!comprobar(M,H,L);
    close(cabinet).
 
+//si le manda el owner el mensaje de que ha tomado la medicina, el robot lo comprueba.
+
+
 //Robot revisa en su conocimiento si hay diferencia entre lo que ve en el cabinet y lo que sab�a que hab�a(-1).
-+!comprobar(M,H)[source(self)]  <-
++!comprobar(M,H,L)[source(self)]  <-
 	comprobarConsumo(M,H);
 	.print("Es verdad que ha cogido ",M);
-	!reducirCantidad(M);
-   !resetearPauta(M).
+   !resetearPauta(M);
+   !simulate_behaviour.
 
 //Robot se da cuenta que el owner no ha tomado la medicina,(no trataremos que el owner lo mienta).
--!comprobar(M,H)[source(self)]  <-
+-!comprobar(M,H,L)[source(self)]  <-
 	.print("No ha cogido ",M,"!");
-	close(cabinet).
+	close(cabinet);
+   .print ("Le llevo yo la medicina ",M);
+   !bring(owner,L).
+
 
 
 +aparta[source(owner)] <- .print("Debo de apartarme");-aparta.
@@ -170,7 +167,7 @@ cargaRapida(3).
    .print("Voy a cargar");
    !go_at(enfermera,cargadorRobot);
    .random(X);
-   if(X<0.9){
+   if(X<0.2){
       !cargaRapida;
    }  
    !cargando.

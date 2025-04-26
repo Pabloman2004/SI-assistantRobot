@@ -218,12 +218,19 @@ public class HouseEnv extends Environment {
 			}
 		}
 
-		for (int i = 0; i < ARRAYAG.length; i++) {
+		for (int i = 0; i < ARRAYAG.length; i++) {			
 			if (i==0 || i == 2) {
-				for (String medicamento : model.medicamentos.keySet()) {
-					addPercept("enfermera", Literal.parseLiteral("cantidad(" + medicamento +","+ model.getAvailableMedicamento(medicamento)+ ")"));
-					addPercept("auxiliar", Literal.parseLiteral("cantidad(" + medicamento + "," + model.getAvailableMedicamento(medicamento)+ ")"));
-				}
+					for (String medicamento : model.medicamentos.keySet()) {
+						if(medicamento.equals(model.getMedMentira())){
+							addPercept("enfermera", Literal.parseLiteral("cantidad(" + medicamento +","+ (model.getAvailableMedicamento(medicamento)-1)+ ")"));
+							addPercept("auxiliar", Literal.parseLiteral("cantidad(" + medicamento + "," + (model.getAvailableMedicamento(medicamento)-1)+ ")"));
+						}
+						else{
+							addPercept("enfermera", Literal.parseLiteral("cantidad(" + medicamento +","+ model.getAvailableMedicamento(medicamento)+ ")"));
+							addPercept("auxiliar", Literal.parseLiteral("cantidad(" + medicamento + "," + model.getAvailableMedicamento(medicamento)+ ")"));
+						}
+						
+					}
 				
 			}
 		}
@@ -336,7 +343,6 @@ public class HouseEnv extends Environment {
 			String drug = action.getTerm(0).toString();
 			model.setMedicamentos(drug,20);//inicilizamos cada medicamento a 20
 			model.setDeliveredMedicamentos(drug,0);//inicializamos el contador de medicamentos entregados a 0
-			System.out.println("Medicamento " + drug + " añadido al cabinet.");
 			result = true;
 		} 
 
@@ -354,10 +360,16 @@ public class HouseEnv extends Environment {
 				result =  true;
 			}
 
-		
-	
-	
 		}
+
+		else if (action.getFunctor().equals("mentirRobot")) {
+			String medicamento = action.getTerm(0).toString();
+			model.setMedMentira(medicamento);
+			result = true;
+			
+		}
+
+
 		/* no funciona
 		else if (action.getFunctor().equals("mostrarBateria")){
 			String mensaje = agNum == 0 

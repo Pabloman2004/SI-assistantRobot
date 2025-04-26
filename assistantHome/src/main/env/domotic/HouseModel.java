@@ -37,6 +37,7 @@ public class HouseModel extends GridWorldModel {
 
 	HashMap<String, Integer> medicamentos = new HashMap<>();
 	HashMap<String, Integer> deliveredMedicamentos = new HashMap<>();
+	private String medMentira = null;
 
 	/*private int deliveredParacetamol = 0;
 	private int deliveredIbuprofeno = 0;
@@ -163,6 +164,18 @@ public class HouseModel extends GridWorldModel {
 		if(bateriaRobots.get(i)>0)
 			bateriaRobots.set(i,bateriaRobots.get(i)-1);		
 			
+	}
+
+
+	public void setMedMentira(String medMentira)
+	{
+		
+		this.medMentira=medMentira;
+	}
+
+	public String getMedMentira()
+	{
+		return medMentira;
 	}
 
 	public void increaseBateriaRobot(int i)
@@ -450,7 +463,6 @@ public class HouseModel extends GridWorldModel {
 				break;
 		}*/
 		medicamentos.put(drug, medicamentos.get(drug)-1);
-		System.out.println("Medicina " + drug + " cantidad: " + medicamentos.get(drug));
 	}
 
 	public boolean takeDrug(int ag, String drug) {
@@ -531,7 +543,7 @@ public class HouseModel extends GridWorldModel {
 	}
 
 	public boolean comprobarConsumo(String drug, int num){
-		return getAvailableMedicamento(drug) == num - 1;
+		return getAvailableMedicamento(drug) == num;
 	}
 
 	public Location getLocation(String loc) {

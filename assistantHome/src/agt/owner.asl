@@ -21,7 +21,7 @@
 !pauta_medicamentos.
 !simulate_behaviour.
 
-pauta(paracetamol,8,6).
+pauta(paracetamol,20,6).
 pauta(ibuprofeno,12,6).
 pauta(lorazepam,22,23).
 pauta(aspirina,1,2).
@@ -73,18 +73,26 @@ pauta_nueva(jarabe,20,12).
 +hour(H) <-
    .random(X);
 
-   if(X < 0.7){   	  
+   if(X < 0.5){   	  
+      .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+      
+      if(not L == []){
+      if(not .intend(tomarMedicina(L)) & not quieto){
+		.print("Me toca la pauta", L);
+      !tomarMedicina(L); 
+      }
+     }
+	 
+   }
+   else{
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
       if(not L == []){
       if(not .intend(tomarMedicina(L)) & not quieto){
-		.print("Es hora de la medicina");
-      !tomarMedicina(L);
-      }
-     }
-	 else{
-		.print("No es hora de la medicina");
-	 }
-   }.
+		   .print("El robot me trae la pauta", L);
+         .send(enfermera,achieve,entregarMedicina(L)); // el owner le dice al robot que le traiga la medicina
+            }
+         }
+	   }.
 
 //@day[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
 //el atomic hace que el send al robot bo se ejecute y no se le cambien las pautas entonces
@@ -155,34 +163,39 @@ pauta_nueva(jarabe,20,12).
    if(.intend(simulate_behaviour)){
       .drop_intention(simulate_behaviour);
    }
-   !tomar(owner,L).
+   .random(X);
+   if(X<0.8){
+      !tomar(owner,L);
+   }
+   else{
+      for(.member(pauta(M,H,F),L))
+      {
+      !go_at(owner,cabinet);
+      mentirRobot(M);
+      .send(enfermera, achieve, comprueba(M,L));
+      !simulate_behaviour;
+      }
+   }.
+   
    
 
 +!tomar(owner,L)[source(self)]
    <- !go_at(owner,cabinet);
-      if(not at(enfermera,cabinet) & not quieto){
          open(cabinet);
-		 .send(enfermera,achieve,comprueba(L));
          for(.member(pauta(M,H,F),L))
          {
             .abolish(pauta(M,H,F));
             !go_at(owner,cabinet);
     		   takeDrug(owner,M);
             .print("He cogido la medicina ", M);
-            .send(enfermera, tell, comprobarConsumo(M));
+            .send(enfermera, achieve, comprueba(M,L));
          };
          for(.member(pauta(M,H,F),L))
          {
             handDrug(M);
          }
          close(cabinet);
-		 !simulate_behaviour
-      }.
-// Initially Owner could be: sit, opening the door, waking up, walking, ...
-//!sit.   			
-//!check_bored. 
-
-//+!init <- !sit ||| !open ||| !walk ||| !wakeup ||| !check_bored.
+		 !simulate_behaviour.
 
 
 +espera <- 
@@ -203,37 +216,3 @@ pauta_nueva(jarabe,20,12).
 		}.
 
 
-
-/*
-+day(D) <- 
-   .random(X); // Genera un número aleatorio X
-   .print("funciona bien? ",X);//comprobacion para ver cuando entra por aqui 
-   if(X < 0.2) { // 20% de posibilidad de cambiar las pautas
-   .findall(pauta(M, H, F), .belief(pauta(M, H, F)), L); // Encuentra todas las pautas
-
-      if (not L == []) {
-          // Extrae solo los nombres de los medicamentos (M)
-          .findall(M, .member(pauta(M, _, _), L), Medicines); // Crea una lista con solo los nombres de los medicamentos
-
-         .random(Medicines, M); // Escoge un medicamento aleatorio
-         .print("Medicamento eliminado: ", M);
-         .send(enfermera, tell, medicamentoEliminado(M)); // Informa al robot
-         for(.member(pauta(M, H, F), L)) {
-               .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
-            }
-            !mostrarPautaActual;
-            }
-         else {
-         !curado;
-       }
- 
- }.
-
-+!curado <- .print("Paciente curado").
-
-+!mostrarPautaActual <- .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
-   .print("Pautas actuales: ",L).
-
-+!curado <- 
-.print("Estoy curado, no necesito medicinas").
-*/
