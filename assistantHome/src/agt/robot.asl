@@ -44,6 +44,7 @@ cargaRapida(3).
       }
      }.
 */
+
 //hay que modificarlo para tener en cuenta la bateria
 +!entregarMedicina(L)[source(owner)]<-
 		if(.intend(simulate_behaviour)){
@@ -71,7 +72,7 @@ cargaRapida(3).
 
 
 //modificar para comprobar bateria
-@medicina[atomic]
+
 +!bring(owner,L)[source(self)]
    <- 
       if(not .belief(comprobarConsumo(_))){
@@ -120,10 +121,11 @@ cargaRapida(3).
 
 +!comprueba(M,L)[source(owner)]<-
 		 	.print("Compruebo el consumo de ",M);
+         .wait(2000);
          !comprobarConsumo(M,L).
 
 // no se modifica
-@comprobarConsumo[atomic]
+//@comprobarConsumo[atomic]
 +!comprobarConsumo(M,L)[source(self)] : cantidad(M,H) <- 
    .drop_intention(simulate_behaviour);//deja de hacer lo que estaba haciendo
    .print("Comprobando consumo ",M);
@@ -190,9 +192,7 @@ cargaRapida(3).
    ?bateria(X);
    ?cargaMaxima(Y);//creencia que pasamos desde el Env
    if(X<Y){
-      cargar;
-      .print("Estoy cargando. ",X);
-      
+      cargar;    
       .wait(517);
       !cargando;
    }else{

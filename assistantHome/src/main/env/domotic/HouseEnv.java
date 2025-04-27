@@ -224,6 +224,7 @@ public class HouseEnv extends Environment {
 						if(medicamento.equals(model.getMedMentira())){
 							addPercept("enfermera", Literal.parseLiteral("cantidad(" + medicamento +","+ (model.getAvailableMedicamento(medicamento)-1)+ ")"));
 							addPercept("auxiliar", Literal.parseLiteral("cantidad(" + medicamento + "," + (model.getAvailableMedicamento(medicamento)-1)+ ")"));
+							model.setMedMentira("");
 						}
 						else{
 							addPercept("enfermera", Literal.parseLiteral("cantidad(" + medicamento +","+ model.getAvailableMedicamento(medicamento)+ ")"));
@@ -365,8 +366,7 @@ public class HouseEnv extends Environment {
 		else if (action.getFunctor().equals("mentirRobot")) {
 			String medicamento = action.getTerm(0).toString();
 			model.setMedMentira(medicamento);
-			result = true;
-			
+			result = true;			
 		}
 
 

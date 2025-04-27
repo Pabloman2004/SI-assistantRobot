@@ -21,11 +21,11 @@
 !pauta_medicamentos.
 !simulate_behaviour.
 
-pauta(paracetamol,20,6).
+pauta(paracetamol,23,6).
 pauta(ibuprofeno,12,6).
-pauta(lorazepam,22,23).
+pauta(lorazepam,11,23).
 pauta(aspirina,1,2).
-//pauta(amoxicilina,15,2).
+pauta(amoxicilina,13,2).
 
 pauta_nueva(brainal,20,12).
 pauta_nueva(benadryl,20,12).
@@ -46,8 +46,19 @@ pauta_nueva(jarabe,20,12).
 	  {
 	  	.send(enfermera,tell,I);
 	  }.
-//Owner cambia las pautas,para ello utiliza numeros aleatorios e informa al robot.
+//Owner cambia las pautas,para ello utiliza numeros aleatorios e informa al robot.\
 
+//llamamos a la funcion que establece la fecha de caducidad de los medicamentos en el .java
+//luego le pasas la percepcion de la caducidad al auxiliar.
+/*
+!caducidad.
++!caducidad[source(self)] <-
+   .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+   for(.member(pauta(M,H,F),L)){
+      setFechaCaducidad(M);
+   }.
+
+*/
 +!simulate_behaviour[source(self)] 
    <- .random(X); .wait(3000*X + 5000); // wait for a random time
     if(X < 0.5){
@@ -69,15 +80,15 @@ pauta_nueva(jarabe,20,12).
     }
     !simulate_behaviour.
 
-@hour[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
+//@hour[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
 +hour(H) <-
    .random(X);
-
    if(X < 0.5){   	  
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
-      
+
       if(not L == []){
       if(not .intend(tomarMedicina(L)) & not quieto){
+
 		.print("Me toca la pauta", L);
       !tomarMedicina(L); 
       }
