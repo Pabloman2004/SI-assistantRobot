@@ -99,7 +99,6 @@ cargaRapida(3).
 	  	.wait(2000);
          .findall(M,.belief(comprobarConsumo(M)),X);
          for(.member(M,X)){
-		 	.print("Compruebo el consumo de ",M);
             !comprobarConsumo(M);
             .abolish(comprobarConsumo(M));
          }

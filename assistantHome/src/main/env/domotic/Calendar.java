@@ -6,7 +6,6 @@ public class Calendar {
     private int hora;
     private LocalDateTime prov;
     private LocalDate dia;
-
     public Calendar() {  
         this.prov = LocalDateTime.now(); // Obtiene la fecha y hora actual      
         this.dia = this.prov.toLocalDate(); // Obtiene la fecha 
@@ -29,9 +28,11 @@ public class Calendar {
     private synchronized void increaseHour() {
         if (this.hora < 23) {
             this.hora ++; // Actualiza la hora
+
         } else {
             this.hora = 0;
             this.dia = this.dia.plusDays(1); // Incrementa el día this.dia.plusDays(1);
+            
         }
         if(this.hora == 0) {
             System.out.println("Día actual: " + this.dia); // Muestra el día actualizado
@@ -46,5 +47,7 @@ public class Calendar {
     public synchronized int getDia() {
         return this.dia.getDayOfMonth(); // Devuelve el día del mes
     }
+
+
     
 }

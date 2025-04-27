@@ -203,9 +203,10 @@ public class HouseEnv extends Environment {
 		//Funciona pero no se porque si hago debug no veo la percepcion de dia en owner
 		if(this.lastDay != calendar.getDia()) {
 			for (int i = 0; i < ARRAYAG.length; i++) {
-					addPercept("owner", Literal.parseLiteral("day(" + calendar.getDia() + ")"));
-					
+					addPercept("owner", Literal.parseLiteral("day(" + calendar.getDia() + ")"));	
+					addPercept("auxiliar", Literal.parseLiteral("day(" + calendar.getDia() + ")"));				
 				}
+			model.reduceCaducidad(); // Llama al método reduceCaducidad() de la clase model
 			this.lastDay = calendar.getDia();	
 		}
 
@@ -235,6 +236,13 @@ public class HouseEnv extends Environment {
 				
 			}
 		}
+
+		for (String medicamento : model.caducidad.keySet()) {			
+				addPercept("auxiliar", Literal.parseLiteral("caducidad(" + medicamento + "," + model.getCaducidad(medicamento)+ ")"));											
+		}
+
+		
+		
 
 	}
 
@@ -341,9 +349,16 @@ public class HouseEnv extends Environment {
 		} 
 
 		else if (action.getFunctor().equals("setMedicamento") && ag.equals("owner")) {
+			
 			String drug = action.getTerm(0).toString();
 			model.setMedicamentos(drug,20);//inicilizamos cada medicamento a 20
 			model.setDeliveredMedicamentos(drug,0);//inicializamos el contador de medicamentos entregados a 0
+
+			double r = Math.random();
+			// para un entero entre 1(incluido) y N (excluido):
+			int N = 5;
+			int randInt = (int)(Math.random() * N) + 1;
+			model.setCaducidad(drug,randInt);
 			result = true;
 		} 
 
@@ -368,7 +383,14 @@ public class HouseEnv extends Environment {
 			model.setMedMentira(medicamento);
 			result = true;			
 		}
+		
 
+		else if (action.getFunctor().equals("eliminarMedicamento")) {
+			String medicamento = action.getTerm(0).toString();
+			model.medicamentos.remove(medicamento);
+			model.caducidad.remove(medicamento);
+			result = true;			
+		}
 
 		/* no funciona
 		else if (action.getFunctor().equals("mostrarBateria")){

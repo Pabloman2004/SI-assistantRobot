@@ -36,6 +36,7 @@ public class HouseModel extends GridWorldModel {
 	private ArrayList<String> ownerDrugs = new ArrayList<>();
 
 	HashMap<String, Integer> medicamentos = new HashMap<>();
+	HashMap<String, Integer> caducidad = new HashMap<>();
 	HashMap<String, Integer> deliveredMedicamentos = new HashMap<>();
 	private String medMentira = null;
 
@@ -186,6 +187,28 @@ public class HouseModel extends GridWorldModel {
     		bateriaRobots.set(i, Math.min(current + 10, maxBattery));
 		}
 	}
+
+	public void setCaducidad(String medicamento, int valor)
+	{
+		caducidad.put(medicamento, valor);
+		System.out.println("Caducidad de " + medicamento + ": " + caducidad.get(medicamento));
+	}
+
+	public int getCaducidad(String medicamento)
+	{
+		return caducidad.get(medicamento);
+	}
+
+	public void reduceCaducidad(){
+		for (String medicamento : caducidad.keySet()) {
+			int valor = caducidad.get(medicamento);
+			if (valor > 0) {
+				caducidad.put(medicamento, valor - 1);
+				System.out.println("Caducidad de " + medicamento + ": " + caducidad.get(medicamento));
+			}
+		}
+	}
+
 	public HouseModel() {
 		// create a GSize x 2GSize grid with 3 mobile agent
 		super(2 * GSize, GSize, 3);

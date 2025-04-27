@@ -141,12 +141,12 @@ pauta_nueva(jarabe,20,12).
 
          .random(Medicines, M); // Escoge un medicamento aleatorio
          .print("Medicamento eliminado: ", M);
+         eliminarMedicamento(M); // Llama a la función para eliminar el medicamento
          .send(enfermera, tell, medicamentoEliminado(M)); // Informa al robot
          for(.member(pauta(M, H, F), L)) {
                .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
                .send(self,tell,pauta_nueva(M,H,F)); // la pauta eliminada pasa a ser una pauta que en un futuro se puede añadir a la base de conocimiento
             }
-            !pasarMedicamentoEnv;
             !mostrarPautaActual;
             }
          else {

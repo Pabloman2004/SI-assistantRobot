@@ -1,5 +1,5 @@
 
-
+carga_rapida(3).
 
 
 
@@ -16,8 +16,10 @@
       !go_at(enfermera,Destino).
 
 
-+!go_at(enfermera,P)[source(self)] : at(auxiliar,P) <- .print("He llegado a ",P).
-+!go_at(enfermera,P)[source(self)] : not at(auxiliar,P) & bateria(X) & X>0
+
+
++!go_at(auxiliar,P)[source(self)] : at(auxiliar,P) <- .print("He llegado a ",P).
++!go_at(auxiliar,P)[source(self)] : not at(auxiliar,P) & bateria(X) & X>0
   <- move_towards(P);
      !go_at(auxiliar,P).
 -!go_at(auxiliar,P)[source(self)]<- apartar;.wait(5);!go_at(auxiliar,P).
