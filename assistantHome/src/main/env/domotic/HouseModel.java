@@ -61,13 +61,13 @@ public class HouseModel extends GridWorldModel {
 	public Location lWasher = new Location(GSize / 2, 0);
 	public Location lFridge = new Location(3, 0);
 	public Location lTable = new Location(GSize / 2, GSize - 3);
-	public Location lVacio = new Location(GSize / 2 + 1, GSize - 3);
+	public Location lVacio = new Location(0, 0);
 	public Location lBed2 = new Location(GSize + 2, 0);
 	public Location lBed3 = new Location(GSize * 2 - 3, 0);
 	public Location lBed1 = new Location(GSize + 1, GSize * 3 / 4);
 	public Location lCabinet = new Location(10, 0);
 	public Location lCargadorRobot = new Location(8, 0);
-
+	
 
 	// Initialization of the doors location on the domotic home scene
 	public Location lDoorHome = new Location(0, GSize - 1);
@@ -111,26 +111,6 @@ public class HouseModel extends GridWorldModel {
 	{
 		return carryingDrugs;
 	}
-	/*	public int getAvailableParacetamol()
-	{
-		return availableParacetamol;
-	}
-	public int getAvailableIbuprofeno()
-	{
-		return availableIbuprofeno;
-	}
-	public int getAvailableLorazepam()
-	{
-		return availableLorazepam;
-	}
-	public int getAvailableAspirina()
-	{
-		return availableAspirina;
-	}
-	public int getAvailableAmoxicilina()
-	{
-		return availableAmoxicilina;
-	}*/
 	
 	public int getAvailableMedicamento(String drug) {		
 		return medicamentos.get(drug);
@@ -204,7 +184,6 @@ public class HouseModel extends GridWorldModel {
 			int valor = caducidad.get(medicamento);
 			if (valor > 0) {
 				caducidad.put(medicamento, valor - 1);
-				System.out.println("Caducidad de " + medicamento + ": " + caducidad.get(medicamento));
 			}
 		}
 	}
@@ -247,7 +226,7 @@ public class HouseModel extends GridWorldModel {
 		add(BED, lBed3);
 		add(CABINET, lCabinet);
 		add(CARGADOR, lCargadorRobot);
-		//add(VACIO,lVacio);
+		add(CARGADOR,lVacio);
 
 		addWall(GSize / 2 + 1, 0, GSize / 2 + 1, GSize / 2 - 2);
         add(DOOR, lDoorKit2);
@@ -352,23 +331,11 @@ public class HouseModel extends GridWorldModel {
 	boolean openCabinet() {
 		cabinetOpen = true;
 		return true;
-		// if (!cabinetOpen) {
-		// 	cabinetOpen = true;
-		// 	return true;
-		// } else {
-		// 	return true;
-		// }
 	}
 
 	boolean closeCabinet() {
 		cabinetOpen = false;
 		return true;
-		// if (cabinetOpen) {
-		// 	cabinetOpen = false;
-		// 	return true;
-		// } else {
-		// 	return false;
-		// }
 	}
 
 	boolean canMoveTo(int Ag, int x, int y) {
@@ -446,46 +413,12 @@ public class HouseModel extends GridWorldModel {
 
 
 	public void reduceAvailableDrug(String drug) {
-		/*switch (drug) {
-			case "paracetamol":
-				availableParacetamol--;
-				if(availableParacetamol <= 0) {
-					System.out.println("Medicina agotada. Rellenando...");
-					addDrug("paracetamol",20);
-				}
-				break;
-			case "ibuprofeno":
-				availableIbuprofeno--;
-				if(availableIbuprofeno <= 0) {
-					System.out.println("Medicina agotada. Rellenando...");
-					addDrug("ibuprofeno", 20);
-				}
-				break;
-			case "lorazepam":
-				availableLorazepam--;
-				if(availableParacetamol <= 0) {
-					System.out.println("Medicina agotada. Rellenando...");
-					addDrug("lorazepam", 20);
-				}
-				break;
-			case "aspirina":
-				availableAspirina--;
-				if(availableAspirina <= 0) {
-					System.out.println("Medicina agotada. Rellenando...");
-					addDrug("aspirina", 20);
-				}
-				break;
-			case "amoxicilina":
-				availableAmoxicilina--;
-				if(availableAmoxicilina <= 0) {
-					System.out.println("Medicina agotada. Rellenando...");
-					addDrug("amoxicilina", 20);
-				}
-				break;
-			default:
-				break;
-		}*/
+
 		medicamentos.put(drug, medicamentos.get(drug)-1);
+		if(medicamentos.get(drug) <= 0) {
+			System.out.println("Medicina agotada. Rellenando...");
+			addDrug(drug,20);
+		}
 	}
 
 	public boolean takeDrug(int ag, String drug) {
@@ -529,25 +462,6 @@ public class HouseModel extends GridWorldModel {
 	}
 
 	public boolean addDrug(String drug, int qtd) {
-		/*switch (drug) {
-			case "paracetamol":
-				availableParacetamol = qtd;
-				break;
-			case "ibuprofeno":
-				availableIbuprofeno = qtd;
-				break;
-			case "lorazepam":
-				availableLorazepam = qtd;
-				break;
-			case "aspirina":
-				availableAspirina = qtd;
-				break;
-			case "amoxicilina":
-				availableAmoxicilina = qtd;
-				break;
-			default:
-				break;
-		}*/
 		medicamentos.put(drug, qtd);
 		return true;
 	}
@@ -651,6 +565,9 @@ public class HouseModel extends GridWorldModel {
 			case "cargadorRobot": 
 				dest = lCargadorRobot;                  
 				break; 
+			case "vacio":
+				dest = lVacio;                  
+				break;
 		}
 		return dest;
 	}

@@ -21,12 +21,23 @@
 !pauta_medicamentos.
 !simulate_behaviour.
 
-pauta(paracetamol,8,6).
+pauta(paracetamol,23,6).
 pauta(ibuprofeno,12,6).
-pauta(lorazepam,22,23).
+pauta(lorazepam,11,23).
 pauta(aspirina,1,2).
-pauta(amoxicilina,15,2).
+pauta(amoxicilina,13,2).
 
+pauta_nueva(brainal,20,12).
+pauta_nueva(benadryl,20,12).
+pauta_nueva(jarabe,20,12).
+
+!pasarMedicamentoEnv.
+@pasarMedicamentoEnv[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
++!pasarMedicamentoEnv[source(self)]  <-
+   .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+   for(.member(pauta(M, H, F), L)) {
+         setMedicamento(M);
+      }.
 
 +pauta(M,H,F)[source(robot)] <- .abolish(pauta(M,H-F,_)).
 +!pauta_medicamentos 
@@ -35,25 +46,19 @@ pauta(amoxicilina,15,2).
 	  {
 	  	.send(enfermera,tell,I);
 	  }.
-//Owner cambia las pautas,para ello utiliza numeros aleatorios e informa al robot.
-+!cambiarPauta(T)
-	<-.findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
-		.print("Reseteando medicinas:");
-		for(.member(pauta(M,H,F),L))
-		{
-			if(not H==T)
-			{
-				.random([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],X);
-				if(not X==T)
-				{
-					.abolish(pauta(M,H,F));
-					.print("Nueva pauta:[",M,",",X,",",F,"]");
-					+pauta(M,X,F);
-					.send(enfermera,tell,pautaNueva(M,X,F));
-				}
-			}
-		}.
+//Owner cambia las pautas,para ello utiliza numeros aleatorios e informa al robot.\
 
+//llamamos a la funcion que establece la fecha de caducidad de los medicamentos en el .java
+//luego le pasas la percepcion de la caducidad al auxiliar.
+/*
+!caducidad.
++!caducidad[source(self)] <-
+   .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+   for(.member(pauta(M,H,F),L)){
+      setFechaCaducidad(M);
+   }.
+
+*/
 +!simulate_behaviour[source(self)] 
    <- .random(X); .wait(3000*X + 5000); // wait for a random time
     if(X < 0.5){
@@ -75,21 +80,88 @@ pauta(amoxicilina,15,2).
     }
     !simulate_behaviour.
 
+//@hour[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
 +hour(H) <-
    .random(X);
+   if(X < 0.5){   	  
+      .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
 
-   if(X < 0.7){   	  
+      if(not L == []){
+      if(not .intend(tomarMedicina(L)) & not quieto){
+
+		.print("Me toca la pauta", L);
+      !tomarMedicina(L); 
+      }
+     }
+	 
+   }
+   else{
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
       if(not L == []){
       if(not .intend(tomarMedicina(L)) & not quieto){
-		.print("Voy a por medicinas ");
-      !tomarMedicina(L);
+		   .print("El robot me trae la pauta", L);
+         .send(enfermera,achieve,entregarMedicina(L)); // el owner le dice al robot que le traiga la medicina
+            }
+         }
+	   }.
+
+//@day[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
+//el atomic hace que el send al robot bo se ejecute y no se le cambien las pautas entonces
++day(D)<-
+   // 15% de probabilidad de cambiar las pautas 
+   .random(X); // Genera un número aleatorio X
+   .send(auxiliar,achieve,day); // el owner le dice al robot que se quede quieto
+   if( X < 0.1){
+   .print("Añadiendo medicamento a la pauta");
+   .findall(pauta_nueva(M,H,F),pauta_nueva(M,H,F),L);
+   .random(L,Nuevo); //se escoge un medicamento aleatorio de la lista de medicamentos nuevos
+   .findall(Nuevo,.belief(pauta(M,H,F)),L2); //se comprueba si ya existe la pauta en la base de conocimiento
+      if(L2 == []){ // si esta vacia significa que ya existe la pauta
+         .print("Ya existe la pauta ",Nuevo);
+         !mostrarPautaActual;
       }
-     }
-	 else{
-		.print("No es hora de la medicina");
-	 }
-   }.
+      else{ // si no existe la pauta se añade a la base de conocimiento
+         Nuevo = pauta_nueva(M, H, F); // Nuevo antes de esta linea contiene pauta_nueva(y los valores dependiendo de la pauta random que se cogio) con esta linea lo que hacemos ess poder acceder a esos valores
+         .send(self, tell, pauta(M,H,F)); // se manda a si mismo la creencia de la nueva pauta
+         .send(enfermera, tell, pauta(M,H,F)); // le manda al robot la nueva pauta
+         !mostrarPautaActual;
+         //si añadimos un medicamento llamamos al metodo que le pasa los medicamentos al .java
+         setMedicamento(M); 
+      }
+      
+      
+      
+   }
+   
+   elif( X < 0.2) { // 20% de posibilidad de cambiar las pautas
+   .findall(pauta(M, H, F), .belief(pauta(M, H, F)), L); // Encuentra todas las pautas
+
+      if (not L == []) {
+          // Extrae solo los nombres de los medicamentos (M)
+          .findall(M, .member(pauta(M, _, _), L), Medicines); // Crea una lista con solo los nombres de los medicamentos
+
+         .random(Medicines, M); // Escoge un medicamento aleatorio
+         .print("Medicamento eliminado: ", M);
+         eliminarMedicamento(M); // Llama a la función para eliminar el medicamento
+         .send(enfermera, tell, medicamentoEliminado(M)); // Informa al robot
+         for(.member(pauta(M, H, F), L)) {
+               .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
+               .send(self,tell,pauta_nueva(M,H,F)); // la pauta eliminada pasa a ser una pauta que en un futuro se puede añadir a la base de conocimiento
+            }
+            !mostrarPautaActual;
+            }
+         else {
+         !curado;
+      }
+
+
+}.
+
+
++!curado <- .print("Paciente sano").
+
++!mostrarPautaActual <- .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
+   .print("Pautas actuales: ",L).
 
 +!go_at(owner,P)[source(self)] : at(owner,P) <- .print("He llegado a ",P).
 +!go_at(owner,P)[source(self)] : not at(owner,P)
@@ -103,37 +175,42 @@ pauta(amoxicilina,15,2).
    if(.intend(simulate_behaviour)){
       .drop_intention(simulate_behaviour);
    }
-   !tomar(owner,L).
+   .random(X);
+   if(X<0.8){
+      !tomar(owner,L);
+   }
+   else{
+      for(.member(pauta(M,H,F),L))
+      {
+      !go_at(owner,cabinet);
+      mentirRobot(M);
+      .send(enfermera, achieve, comprueba(M,L));
+      !simulate_behaviour;
+      }
+   }.
+   
    
 
 +!tomar(owner,L)[source(self)]
    <- !go_at(owner,cabinet);
-      if(not at(enfermera,cabinet) & not quieto){
          open(cabinet);
-		 .send(enfermera,achieve,comprueba(L));
          for(.member(pauta(M,H,F),L))
          {
             .abolish(pauta(M,H,F));
             !go_at(owner,cabinet);
     		   takeDrug(owner,M);
             .print("He cogido la medicina ", M);
-            .send(enfermera, tell, comprobarConsumo(M));
+            .send(enfermera, achieve, comprueba(M,L));
          };
          for(.member(pauta(M,H,F),L))
          {
             handDrug(M);
          }
          close(cabinet);
-		 !simulate_behaviour
-      }.
-// Initially Owner could be: sit, opening the door, waking up, walking, ...
-//!sit.   			
-//!check_bored. 
-
-//+!init <- !sit ||| !open ||| !walk ||| !wakeup ||| !check_bored.
+		 !simulate_behaviour.
 
 
-+espera :not durmiendo<- 
++espera <- 
 	if(.intend(simulate_behaviour))
 	{
 		.drop_intention(simulate_behaviour);
@@ -150,45 +227,4 @@ pauta(amoxicilina,15,2).
 			!simulate_behaviour;
 		}.
 
-+!consume(A)[source(self)] : not .intend(consume(A))
-   <- 
-   .print("Voy a tomar ",A);
-   consume(A);
-   .wait(2000);
-   .print("He tomado ",A).	                                                                        
-	
 
-
-/*
-+day(D) <- 
-   .random(X); // Genera un número aleatorio X
-   .print("funciona bien? ",X);//comprobacion para ver cuando entra por aqui 
-   if(X < 0.2) { // 20% de posibilidad de cambiar las pautas
-   .findall(pauta(M, H, F), .belief(pauta(M, H, F)), L); // Encuentra todas las pautas
-
-      if (not L == []) {
-          // Extrae solo los nombres de los medicamentos (M)
-          .findall(M, .member(pauta(M, _, _), L), Medicines); // Crea una lista con solo los nombres de los medicamentos
-
-         .random(Medicines, M); // Escoge un medicamento aleatorio
-         .print("Medicamento eliminado: ", M);
-         .send(enfermera, tell, medicamentoEliminado(M)); // Informa al robot
-         for(.member(pauta(M, H, F), L)) {
-               .abolish(pauta(M,H,F)); // Elimina la pauta de la base de conocimiento
-            }
-            !mostrarPautaActual;
-            }
-         else {
-         !curado;
-       }
- 
- }.
-
-+!curado <- .print("Paciente curado").
-
-+!mostrarPautaActual <- .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
-   .print("Pautas actuales: ",L).
-
-+!curado <- 
-.print("Estoy curado, no necesito medicinas").
-*/

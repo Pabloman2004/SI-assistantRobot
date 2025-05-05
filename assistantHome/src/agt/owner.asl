@@ -110,6 +110,7 @@ pauta_nueva(jarabe,20,12).
 +day(D)<-
    // 15% de probabilidad de cambiar las pautas 
    .random(X); // Genera un número aleatorio X
+   .send(auxiliar,achieve,day); // el owner le dice al robot que se quede quieto
    if( X < 0.1){
    .print("Añadiendo medicamento a la pauta");
    .findall(pauta_nueva(M,H,F),pauta_nueva(M,H,F),L);

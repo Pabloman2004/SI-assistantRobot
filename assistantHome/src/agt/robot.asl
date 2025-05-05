@@ -175,17 +175,16 @@ cargaRapida(3).
 
 +!cargaRapida[source(self)] : at(enfermera,cargadorRobot) & cargaRapida(X)<- 
    .print("Carga rapida");
-   if(X>0){
+   if(X==0){
+      .abolish(cargaRapida(X));
+      +cargaRapida(3);
+      reducirCapacidad;
+   }
       .print("La carga rapida se puede llevar a cabo");
       .abolish(cargaRapida(X));
       +cargaRapida(X-1);
       cargaRapidaEnv;
-      .print("Carga rapida realizada");
-   }
-   else{
-      .print("No se puede llevar a cabo la carga rapida");
-      !cargando;
-   }.
+      .print("Carga rapida realizada").
 
    +!cargando :at(enfermera,cargadorRobot)<-
    ?bateria(X);

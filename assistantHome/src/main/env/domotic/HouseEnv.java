@@ -203,8 +203,7 @@ public class HouseEnv extends Environment {
 		//Funciona pero no se porque si hago debug no veo la percepcion de dia en owner
 		if(this.lastDay != calendar.getDia()) {
 			for (int i = 0; i < ARRAYAG.length; i++) {
-					addPercept("owner", Literal.parseLiteral("day(" + calendar.getDia() + ")"));	
-					addPercept("auxiliar", Literal.parseLiteral("day(" + calendar.getDia() + ")"));				
+					addPercept("owner", Literal.parseLiteral("day(" + calendar.getDia() + ")"));				
 				}
 			model.reduceCaducidad(); // Llama al método reduceCaducidad() de la clase model
 			this.lastDay = calendar.getDia();	
@@ -319,34 +318,34 @@ public class HouseEnv extends Environment {
 		else if (action.getFunctor().equals("updatePercepts")) {
 			result = true;
 		}
+
 		else if (action.getFunctor().equals("addDrug") && ag.equals("auxiliar")) {
 			String drug = action.getTerm(0).toString();
 			int qtd=Integer.parseInt(action.getTerm(1).toString());
 			result=model.addDrug(drug,qtd);
 			model.setAuxiliarCargar(0);
 		}
-		else if (action.getFunctor().equals("cargar") && ag.equals("enfermera")) {
+
+		else if (action.getFunctor().equals("cargar") && ag.equals("enfermera") || ag.equals("auxiliar")) {
 
 			model.increaseBateriaRobot(agNum);
 			result = true;
 		}
-		else if (action.getFunctor().equals("cargar") && ag.equals("auxiliar")) {
+		/*else if (action.getFunctor().equals("cargar") && ag.equals("auxiliar") || ag.equals("enfermera")) {
 
 			model.increaseBateriaRobot(agNum);
 			result = true; 
-		} 
-		//else if (action.getFunctor().equals("setBateria") && ag.equals("owner")) {
-		//	String agente=action.getTerm(0).toString();
-		//	model.setBateriaRobot(agente,200);
-		//	result = true; 
-		
-		//}
+		} */
 
 		else if (action.getFunctor().equals("cargaRapidaEnv") && ag.equals("enfermera")) {
-			model.setBateriaRobot(agNum, (int)(maximaBateria*0.95));
-			maximaBateria = (int)(maximaBateria*0.95);
+			model.setBateriaRobot(agNum, (int)(maximaBateria));			
 			result = true; 
 		} 
+
+		else if(action.getFunctor().equals("reducirCapacidad") && ag.equals("enfermera")){
+			maximaBateria = (int)(maximaBateria*0.95);
+		}
+
 
 		else if (action.getFunctor().equals("setMedicamento") && ag.equals("owner")) {
 			
@@ -360,7 +359,9 @@ public class HouseEnv extends Environment {
 			int randInt = (int)(Math.random() * N) + 1;
 			model.setCaducidad(drug,randInt);
 			result = true;
-		} 
+		}
+		
+		
 
 		else if (action.getFunctor().equals("getCost")) {
 			Location dest = model.getLocation(action.getTerm(0).toString());
@@ -392,16 +393,16 @@ public class HouseEnv extends Environment {
 			result = true;			
 		}
 
-		/* no funciona
-		else if (action.getFunctor().equals("mostrarBateria")){
-			String mensaje = agNum == 0 
-    			? "Batería enfermera: " + model.getBateriaRobot(agNum) 
-    			: "Batería auxiliar: " + model.getBateriaRobot(agNum);
-
-			System.out.println(mensaje);
-			result = true;		
+		else if (action.getFunctor().equals("reponerMedicamento")) {
+			String medicamento = action.getTerm(0).toString();
+			double r = Math.random();
+			// para un entero entre 1(incluido) y N (excluido):
+			int N = 5;
+			int randInt = (int)(Math.random() * N) + 1;
+			model.setCaducidad(medicamento,randInt);
+			model.setMedicamentos(medicamento,20);//inicilizamos cada medicamento a 20
+			result = true;			
 		}
-		*/
 		
 			
 		else {
