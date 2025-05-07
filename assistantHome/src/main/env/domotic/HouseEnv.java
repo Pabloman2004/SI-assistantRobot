@@ -130,7 +130,7 @@ public class HouseEnv extends Environment {
 			}
 
 			if (lAgent.distance(lRobot) < 2 && i != 0) {
-				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",robot)"));
+				addPercept(ARRAYAG[i], Literal.parseLiteral("at(" + ARRAYAG[i] + ",enfermera)"));
 
 			}
 			if (lAgent.distance(lAuxiliar) < 2 && i!=2) {

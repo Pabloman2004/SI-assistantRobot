@@ -52,6 +52,7 @@ carga_rapida(3).
 
 +!day [source(owner)] <-
    .wait(1000);
+   
    .findall(caducidad(M,X),.belief(caducidad(M,X)),L);
    .print("Medicamentos caducados: ",L);
    for(.member(caducidad(Med,Old), L)) {
@@ -67,6 +68,25 @@ carga_rapida(3).
       }
       
    }.
+
++!llevarMedicina(L) <-
+   .print("Acercando la medicina al robot");
+   
+   !go_at(auxiliar,cabinet);
+   open(cabinet);
+   for(.member(pauta(M,H,F),L))
+         {
+            takeDrug(auxiliar,M);
+            .print("He cogido ", M);
+         };
+   close(cabinet);
+   !go_at(auxiliar,enfermera);
+   if(not at(auxiliar,enfermera))
+   {   
+   .send(enfermera,tell,espera);
+   }
+   .send(enfermera,achieve, llevarOwner(owner,L));   
+   !go_at(auxiliar,delivery).
 
 +!go_at(auxiliar,P)[source(self)] : at(auxiliar,P) <- .print("He llegado a ",P).
 +!go_at(auxiliar,P)[source(self)] : not at(auxiliar,P) & bateria(X) & X>0

@@ -83,6 +83,7 @@ pauta_nueva(jarabe,20,12).
 //@hour[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
 +hour(H) <-
    .random(X);
+   .print("Cuantas veces entra aqui " ,X);
    if(X < 0.5){   	  
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
 
@@ -223,7 +224,7 @@ pauta_nueva(jarabe,20,12).
 		if(.intend(tomarMedicina(_))){
 			.drop_intention(tomarMedicina(_));
 		}
-		if(not .intend(simulate_behaviour) & not durmiendo){
+		if(not .intend(simulate_behaviour)){
 			!simulate_behaviour;
 		}.
 

@@ -46,12 +46,15 @@ cargaRapida(3).
 */
 
 //hay que modificarlo para tener en cuenta la bateria
-+!entregarMedicina(L)[source(owner)]<-
++!entregarMedicina(L)[source(owner)]<- 
 		if(.intend(simulate_behaviour)){
 			.drop_intention(simulate_behaviour);
 		}
-		.print("Las entrego yo");
-		!bring(owner,L).
+      !go_at(enfermera,washer);
+      .send(owner,tell,espera);
+      .send(auxiliar,achieve, llevarMedicina(L)). // el robot le dice al auxiliar que le acerque la medicina
+		//.print("Las entrego yo").
+		//!bring(owner,L).
 		//!simulate_behaviour;
 	
 //metodo que no hay que modificar
@@ -73,7 +76,7 @@ cargaRapida(3).
 
 //modificar para comprobar bateria
 
-+!bring(owner,L)[source(self)]
++!bring(owner,L)
    <- 
       if(not .belief(comprobarConsumo(_))){
          .send(owner, tell, quieto);
@@ -103,6 +106,21 @@ cargaRapida(3).
             .abolish(comprobarConsumo(M));
          }
       }.
+
++!llevarOwner(owner,L) <- 
+      .print("El auxiliar me dio la meidicina, voy a llevarsela al owner"); 
+      .send(owner, tell, quieto);
+
+     .send(owner,tell,espera);
+      for(.member(pauta(M,H,F),L))
+      {       
+         !go_at(enfermera,owner);
+       	.print("Le he dado ", M);
+            handDrug(M);
+         !resetearPauta(M);
+         }
+         .send(owner, untell, quieto);
+         !simulate_behaviour.
 	  
 //no se modifica
 @recibir[atomic]
@@ -126,9 +144,11 @@ cargaRapida(3).
 // no se modifica
 //@comprobarConsumo[atomic]
 +!comprobarConsumo(M,L)[source(self)] : cantidad(M,H) <- 
-   .drop_intention(simulate_behaviour);//deja de hacer lo que estaba haciendo
+   .drop_intention(simulate_behaviour); //deja de hacer lo que estaba haciendo
    .print("Comprobando consumo ",M);
-   !go_at(enfermera,cabinet);
+   if(not at(enfermera,cabinet)){
+      !go_at(enfermera,cabinet);
+   }   
    open(cabinet);
 	!comprobar(M,H,L);
    close(cabinet).
@@ -209,3 +229,11 @@ cargaRapida(3).
    <- .print("No tengo bateria suficiente, voy a cargar");
       !cargar;
       !go_at(enfermera,Destino).
+
++espera <- 
+	if(.intend(simulate_behaviour))
+	{
+		.drop_intention(simulate_behaviour);
+		!simulate_behaviour;
+	};
+	.abolish(espera). 

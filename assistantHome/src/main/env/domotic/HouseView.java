@@ -229,7 +229,7 @@ public class HouseView extends GridWorldView {
 					drawImage(g,x,y,objPath);
 				};
 				g.setColor(Color.black);
-				super.drawString(g, x, y, defaultFont, "auxliar");
+				super.drawString(g, x, y, defaultFont, "aux");
 			}
 		} 
 

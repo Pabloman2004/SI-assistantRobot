@@ -422,7 +422,7 @@ public class HouseModel extends GridWorldModel {
 	}
 
 	public boolean takeDrug(int ag, String drug) {
-		if (ag == 0) {// la coge la enfermera
+		if (ag == 0 || ag ==2) {// la coge la enfermera
 			if (cabinetOpen && getAvailableMedicamento(drug) > 0) {
 				reduceAvailableDrug(drug);
 				carryingDrugs++;
@@ -492,11 +492,14 @@ public class HouseModel extends GridWorldModel {
 			case "cabinet": 
 				dest = lCabinet; 
 				break;
-			case "robot":
+			case "enfermera":
 				dest = getAgPos(0);
 				break;
 			case "owner":
 				dest = getAgPos(1);
+				break;
+				case "auxiliar":
+				dest = getAgPos(2);
 				break;
 			case "delivery":
 				dest = lDeliver;

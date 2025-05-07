@@ -31,6 +31,8 @@ pauta_nueva(brainal,20,12).
 pauta_nueva(benadryl,20,12).
 pauta_nueva(jarabe,20,12).
 
+lastHour(-1).
+
 !pasarMedicamentoEnv.
 @pasarMedicamentoEnv[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
 +!pasarMedicamentoEnv[source(self)]  <-
@@ -59,6 +61,7 @@ pauta_nueva(jarabe,20,12).
    }.
 
 */
+
 +!simulate_behaviour[source(self)] 
    <- .random(X); .wait(3000*X + 5000); // wait for a random time
     if(X < 0.5){
@@ -81,8 +84,10 @@ pauta_nueva(jarabe,20,12).
     !simulate_behaviour.
 
 //@hour[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
-+hour(H) <-
++hour(H) :  lastHour(Old) & H \== Old <-
+   -lastHour(Old); +lastHour(H);
    .random(X);
+   .print("Cuantas veces entra aqui " ,X);
    if(X < 0.5){   	  
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
 
@@ -106,7 +111,7 @@ pauta_nueva(jarabe,20,12).
 	   }.
 
 //@day[atomic] // para que no se pueda ejecutar otra cosa si se esta ejecutando esta regla
-//el atomic hace que el send al robot bo se ejecute y no se le cambien las pautas entonces
+//el atomic hace que el send al robot bo se ejecute y no se le cambien zlas pautas entonces
 +day(D)<-
    // 15% de probabilidad de cambiar las pautas 
    .random(X); // Genera un número aleatorio X
@@ -223,7 +228,7 @@ pauta_nueva(jarabe,20,12).
 		if(.intend(tomarMedicina(_))){
 			.drop_intention(tomarMedicina(_));
 		}
-		if(not .intend(simulate_behaviour) & not durmiendo){
+		if(not .intend(simulate_behaviour)){
 			!simulate_behaviour;
 		}.
 
