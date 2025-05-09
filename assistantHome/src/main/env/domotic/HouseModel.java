@@ -163,9 +163,17 @@ public class HouseModel extends GridWorldModel {
 	{
 		int current = bateriaRobots.get(i);
 		int maxBattery = 288;
-		if (current < maxBattery) {
-    		bateriaRobots.set(i, Math.min(current + 10, maxBattery));
+		if(i == 0) {
+			if (current < maxBattery ) {
+				bateriaRobots.set(i, Math.min(current + 10, maxBattery));
+			}
 		}
+		else {
+			if (current < maxBattery) {
+				bateriaRobots.set(i, Math.min(current + 5, maxBattery)); // auxiliar se carga más lento
+			}
+		}
+		
 	}
 
 	public void setCaducidad(String medicamento, int valor)

@@ -4,14 +4,14 @@ carga_rapida(3).
 
 +!cargar <-
    .print("Voy a cargar");
-   !go_at(enfermera,cargadorRobot);
+   !go_at(auxiliar,cargadorRobot);
    .random(X);
    if(X<0.2){
       !cargaRapida;
    }  
    !cargando.
 
-+!cargando :at(enfermera,cargadorRobot)<-
++!cargando : at(auxiliar,cargadorRobot)<-
    ?bateria(X);
    ?cargaMaxima(Y);//creencia que pasamos desde el Env
    if(X<Y){
@@ -25,7 +25,7 @@ carga_rapida(3).
 -!cargando
 	<-.print("Ya no puedo cargar").
 
-+!cargaRapida[source(self)] : at(enfermera,cargadorRobot) & cargaRapida(X)<- 
++!cargaRapida[source(self)] : at(auxiliar,cargadorRobot) & cargaRapida(X)<- 
    .print("Carga rapida");
    if(X==0){
       .abolish(cargaRapida(X));
@@ -69,9 +69,10 @@ carga_rapida(3).
       
    }.
 
-+!llevarMedicina(L) <-
-   .print("Acercando la medicina al robot");
++!llevarMedicina(L) : getCost(cabinet) <-
    
+   
+   .print("Acercando la medicina al robot ");
    !go_at(auxiliar,cabinet);
    open(cabinet);
    for(.member(pauta(M,H,F),L))
@@ -87,6 +88,33 @@ carga_rapida(3).
    }
    .send(enfermera,achieve, llevarOwner(owner,L));   
    !go_at(auxiliar,delivery).
+
+-!llevarMedicina(L) <-
+   .print("No tengo bateria suficiente, voy a cargar");
+   .send(enfermera,achieve,bring(owner,L));
+   .wait(2000);
+   !cargar.
+
+
++!entregarAlOwner(L) <-
+   .send(owner, tell, quieto);
+         open(cabinet);
+         for(.member(pauta(M,H,F),L))
+         {
+            takeDrug(auxiliar,M);
+            !go_at(auxiliar,cabinet);
+            .print("He cogido ", M);
+         };
+         close(cabinet);
+		 .send(owner,tell,espera);
+         for(.member(pauta(M,H,F),L))
+         {       
+         !go_at(auxiliar,owner);
+		 	.print("Le he dado ", M);
+            handDrug(M);
+			.send(enfermera,achieve,resetearPauta(M));
+         }
+         .send(owner, untell, quieto).
 
 +!go_at(auxiliar,P)[source(self)] : at(auxiliar,P) <- .print("He llegado a ",P).
 +!go_at(auxiliar,P)[source(self)] : not at(auxiliar,P) & bateria(X) & X>0

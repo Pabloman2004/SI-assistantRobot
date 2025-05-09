@@ -45,20 +45,27 @@ cargaRapida(3).
      }.
 */
 
-//hay que modificarlo para tener en cuenta la bateria
-+!entregarMedicina(L)[source(owner)]<- 
+
++!entregarMedicina(L) <- 
+      getCost(washer);
 		if(.intend(simulate_behaviour)){
 			.drop_intention(simulate_behaviour);
 		}
+      //!comprobar_bateria_movimiento(washer);
+      //.print("Entro aquí1 "); 
       !go_at(enfermera,washer);
-      .send(owner,tell,espera);
+      .send(owner,tell,quieto);
       .send(auxiliar,achieve, llevarMedicina(L)). // el robot le dice al auxiliar que le acerque la medicina
-		//.print("Las entrego yo").
-		//!bring(owner,L).
-		//!simulate_behaviour;
-	
+
+
+-! entregarMedicina(L)<-
+         .print("Entro aquí2 ");
+         .send(auxiliar,achieve,entregarAlOwner(L)); // el robot le dice al auxiliar que le acerque la medicina directamente al owner;
+         .print("No tengo bateria suficiente, voy a cargar");
+         !cargar.
+
 //metodo que no hay que modificar
-+!resetearPauta(M)[source(self)] : pauta(M,H,F) 
++!resetearPauta(M): pauta(M,H,F) 
 <- 
    .abolish(pauta(M,H,F));
     //Y = H+F;
@@ -76,7 +83,7 @@ cargaRapida(3).
 
 //modificar para comprobar bateria
 
-+!bring(owner,L)
++!bring(owner,L) : getCost(owner)
    <- 
       if(not .belief(comprobarConsumo(_))){
          .send(owner, tell, quieto);
@@ -106,6 +113,12 @@ cargaRapida(3).
             .abolish(comprobarConsumo(M));
          }
       }.
+
+   -!bring(owner,L) <-
+      .print("No tengo bateria suficiente, voy a cargar");
+      .send(owner, achieve, tomar(L)); // si pongo tomarMedicina, el owner puede mentir
+      !cargar;
+      .wait(2000).
 
 +!llevarOwner(owner,L) <- 
       .print("El auxiliar me dio la meidicina, voy a llevarsela al owner"); 

@@ -21,9 +21,9 @@
 !pauta_medicamentos.
 !simulate_behaviour.
 
-pauta(paracetamol,23,6).
+pauta(paracetamol,14,6).
 pauta(ibuprofeno,12,6).
-pauta(lorazepam,11,23).
+pauta(lorazepam,16,23).
 pauta(aspirina,1,2).
 pauta(amoxicilina,13,2).
 
@@ -87,8 +87,7 @@ lastHour(-1).
 +hour(H) :  lastHour(Old) & H \== Old <-
    -lastHour(Old); +lastHour(H);
    .random(X);
-   .print("Cuantas veces entra aqui " ,X);
-   if(X < 0.5){   	  
+   if(X < 0.1){   	  
       .findall(pauta(M,H,F),.belief(pauta(M,H,F)),L);
 
       if(not L == []){
@@ -196,7 +195,7 @@ lastHour(-1).
    
    
 
-+!tomar(owner,L)[source(self)]
++!tomar(owner,L)
    <- !go_at(owner,cabinet);
          open(cabinet);
          for(.member(pauta(M,H,F),L))

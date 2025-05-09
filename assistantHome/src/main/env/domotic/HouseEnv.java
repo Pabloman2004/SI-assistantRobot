@@ -59,7 +59,7 @@ public class HouseEnv extends Environment {
 	public void init(String[] args) {
 		model = new HouseModel();
 		calendar = new Calendar();	
-		model.setBateriaRobot(0,model.getGsize() * model.getGsize() * 2); // numero de celdas 12 e alto (Gsize) 24 de ancho
+		model.setBateriaRobot(0,model.getGsize() * model.getGsize() * 2); // numero de celdas 12 e alto (Gsize) 24 de ancho 
 		model.setBateriaRobot(2,model.getGsize() * model.getGsize() * 2);
 		maximaBateria = model.getBateriaRobot(0);
 		lastDay = 0;
@@ -371,12 +371,11 @@ public class HouseEnv extends Environment {
 			int costCarga = pathCarga.getCost();
 			int cost = (path.getCost());
 			int costeTotal = cost + costCarga;
-			if( (int)(costeTotal * 1.5) > model.getBateriaRobot(agNum) ){
+			if( (int)(costeTotal * 1.5)> model.getBateriaRobot(agNum) ){
 				result = false;
 			}else{
 				result =  true;
 			}
-
 		}
 
 		else if (action.getFunctor().equals("mentirRobot")) {

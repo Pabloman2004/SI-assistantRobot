@@ -45,19 +45,27 @@ cargaRapida(3).
      }.
 */
 
-//hay que modificarlo para tener en cuenta la bateria
-+!entregarMedicina(L)[source(owner)]<- 
+
++!entregarMedicina(L) <- 
+      getCost(washer);
 		if(.intend(simulate_behaviour)){
 			.drop_intention(simulate_behaviour);
 		}
-      .send(owner,tell,espera);
+      //!comprobar_bateria_movimiento(washer);
+      //.print("Entro aquí1 "); 
+      !go_at(enfermera,washer);
+      .send(owner,tell,quieto);
       .send(auxiliar,achieve, llevarMedicina(L)). // el robot le dice al auxiliar que le acerque la medicina
-		//.print("Las entrego yo").
-		//!bring(owner,L).
-		//!simulate_behaviour;
-	
+
+
+-! entregarMedicina(L)<-
+         .print("Entro aquí2 ");
+         .send(auxiliar,achieve,entregarAlOwner(L)); // el robot le dice al auxiliar que le acerque la medicina directamente al owner;
+         .print("No tengo bateria suficiente, voy a cargar");
+         !cargar.
+
 //metodo que no hay que modificar
-+!resetearPauta(M)[source(self)] : pauta(M,H,F) 
++!resetearPauta(M): pauta(M,H,F) 
 <- 
    .abolish(pauta(M,H,F));
     //Y = H+F;
@@ -143,7 +151,7 @@ cargaRapida(3).
 // no se modifica
 //@comprobarConsumo[atomic]
 +!comprobarConsumo(M,L)[source(self)] : cantidad(M,H) <- 
-   .drop_intention(simulate_behaviour);//deja de hacer lo que estaba haciendo
+   .drop_intention(simulate_behaviour); //deja de hacer lo que estaba haciendo
    .print("Comprobando consumo ",M);
    if(not at(enfermera,cabinet)){
       !go_at(enfermera,cabinet);
