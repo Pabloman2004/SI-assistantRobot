@@ -1,6 +1,11 @@
 
 carga_rapida(3).
 
+!probar.
+
++!probar <- 
+   .print("Voy a probar");
+   prueba.
 
 +!cargar <-
    .print("Voy a cargar");
@@ -13,13 +18,14 @@ carga_rapida(3).
 
 +!cargando : at(auxiliar,cargadorRobot)<-
    ?bateria(X);
-   ?cargaMaxima(Y);//creencia que pasamos desde el Env
+   ?cargaMaxima(Y); //creencia que pasamos desde el Env
    if(X<Y){
       cargar;    
       .wait(517);
       !cargando;
    }else{
-      .print("He acabado de cargar.")
+      .print("He acabado de cargar.");
+      !go_at(aux,delivery);
    }.
 
 -!cargando
@@ -39,10 +45,9 @@ carga_rapida(3).
       .print("Carga rapida realizada").
 
 +!comprobar_bateria_movimiento(Destino)
-   <- getCost(Destino);
-      // una vez
-      .print("Tengo bateria suficiente, puedo ir ");
-      //mostrar_bateria;
+   <- 
+      
+      getCost(Destino);
       !go_at(auxiliar,Destino).
 
 -!comprobar_bateria_movimiento(Destino)
@@ -69,11 +74,12 @@ carga_rapida(3).
       
    }.
 
-+!llevarMedicina(L) : getCost(cabinet) <-
-   
-   
-   .print("Acercando la medicina al robot ");
++!llevarMedicina(L) <-
+   getCost2(cabinet,enfermera);
+   prueba;
+   .print("Puedo llevar la medicina al enfermera");
    !go_at(auxiliar,cabinet);
+   
    open(cabinet);
    for(.member(pauta(M,H,F),L))
          {
@@ -96,7 +102,8 @@ carga_rapida(3).
    !cargar.
 
 
-+!entregarAlOwner(L) <-
++!entregarAlOwner(L)  <-
+   getCost(cabinet);
    .send(owner, tell, quieto);
          open(cabinet);
          for(.member(pauta(M,H,F),L))
@@ -115,6 +122,13 @@ carga_rapida(3).
 			.send(enfermera,achieve,resetearPauta(M));
          }
          .send(owner, untell, quieto).
+
+-!entregarAlOwner(L) <-
+   .print("No tengo bateria suficiente, voy a cargar");
+   .send(owner,achieve,tomar(owner,L));
+   .wait(2000);
+   !cargar.
+   
 
 +!go_at(auxiliar,P)[source(self)] : at(auxiliar,P) <- .print("He llegado a ",P).
 +!go_at(auxiliar,P)[source(self)] : not at(auxiliar,P) & bateria(X) & X>0

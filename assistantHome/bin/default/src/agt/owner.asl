@@ -23,8 +23,8 @@
 
 pauta(paracetamol,14,6).
 pauta(ibuprofeno,12,6).
-pauta(lorazepam,13,23).
-pauta(aspirina,1,2).
+pauta(lorazepam,16,23).
+pauta(aspirina,15,2).
 pauta(amoxicilina,13,2).
 
 pauta_nueva(brainal,20,12).
@@ -195,7 +195,7 @@ lastHour(-1).
    
    
 
-+!tomar(owner,L)[source(self)]
++!tomar(owner,L)
    <- !go_at(owner,cabinet);
          open(cabinet);
          for(.member(pauta(M,H,F),L))

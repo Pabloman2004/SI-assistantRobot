@@ -140,10 +140,11 @@ public class HouseModel extends GridWorldModel {
 	{
 		bateriaRobots.set(i,valor);
 	}
-	public void reduceBateriaRobot(int i)
+	public void reduceBateriaRobot(int i, int cantidad)
 	{
+		System.out.println("Bateria robot " + i + "siendo reducida: " + cantidad);
 		if(bateriaRobots.get(i)>0)
-			bateriaRobots.set(i,bateriaRobots.get(i)-1);		
+			bateriaRobots.set(i,bateriaRobots.get(i)-cantidad);		
 			
 	}
 
@@ -162,15 +163,14 @@ public class HouseModel extends GridWorldModel {
 	public void increaseBateriaRobot(int i)
 	{
 		int current = bateriaRobots.get(i);
-		int maxBattery = 288;
 		if(i == 0) {
-			if (current < maxBattery ) {
-				bateriaRobots.set(i, Math.min(current + 10, maxBattery));
+			if (current < 300 ) {
+				bateriaRobots.set(i, Math.min(current + 10, 300));
 			}
 		}
-		else {
-			if (current < maxBattery) {
-				bateriaRobots.set(i, Math.min(current + 5, maxBattery)); // auxiliar se carga más lento
+		else if(i == 2){
+			if (current < 288) {
+				bateriaRobots.set(i, Math.min(current + 5, 288)); // auxiliar se carga más lento
 			}
 		}
 		

@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class HouseEnv extends Environment {
 
 	// common literals
-	public static final String ARRAYAG[] = { "enfermera", "owner", "auxiliar" }; //Array de agentes. Facilitará la gestión de estos cuando haya que añadir más.
+	public static final String ARRAYAG[] = { "enfermera", "owner", "auxiliar"}; //Array de agentes. Facilitará la gestión de estos cuando haya que añadir más.
 	public static final Literal of = Literal.parseLiteral("open(fridge)");
 	public static final Literal clf = Literal.parseLiteral("close(fridge)");
 	public static final Literal oc = Literal.parseLiteral("open(cabinet)");
@@ -34,7 +34,7 @@ public class HouseEnv extends Environment {
 	public static final Literal adbat1 = Literal.parseLiteral("at(enfermera,lDoorBath1)");
 	public static final Literal adob3 = Literal.parseLiteral("at(enfermera,lDoorBed3)");
 	public static final Literal adob2 = Literal.parseLiteral("at(enfermera,lDoorBed2)");
-	public static final Literal ac = Literal.parseLiteral("at(robot,cabinet)");
+	public static final Literal ac = Literal.parseLiteral("at(enfermera,cabinet)");
 
 	public static final Literal oaf = Literal.parseLiteral("at(owner,fridge)");
 	public static final Literal oac1 = Literal.parseLiteral("at(owner,chair1)");
@@ -59,8 +59,8 @@ public class HouseEnv extends Environment {
 	public void init(String[] args) {
 		model = new HouseModel();
 		calendar = new Calendar();	
-		model.setBateriaRobot(0,model.getGsize() * model.getGsize() * 2); // numero de celdas 12 e alto (Gsize) 24 de ancho 
-		model.setBateriaRobot(2,model.getGsize() * model.getGsize() * 2);
+		model.setBateriaRobot(0, model.getGsize() * model.getGsize() * 2); // numero de celdas 12 e alto (Gsize) 24 de ancho model.getGsize() * model.getGsize() * 2
+		model.setBateriaRobot(2, model.getGsize() * model.getGsize() * 2);
 		maximaBateria = model.getBateriaRobot(0);
 		lastDay = 0;
 		if (args.length == 1 && args[0].equals("gui")) {
@@ -247,6 +247,10 @@ public class HouseEnv extends Environment {
 
 	@Override
 	public boolean executeAction(String ag, Structure action) {
+		//System.out.println("Acción recibida: " + action.getFunctor() + " del agente: " + ag);
+		//System.err.println("Valor de ag: " + ag);
+		//System.err.println("Comparación con 'auxiliar': " + ag.equals("auxiliar"));
+		int coste = 0;
 		int agNum = -1;
 		int it = -1;
 		while (++it < ARRAYAG.length && agNum == -1) {
@@ -280,6 +284,7 @@ public class HouseEnv extends Environment {
 
 		} else if (action.equals(of)) { // of = open(fridge)
 			result = model.openFridge();
+			
 		} 
 		else if (action.equals(clf)) { // clf = close(fridge)
 			result = model.closeFridge();
@@ -290,6 +295,46 @@ public class HouseEnv extends Environment {
 		 else if (action.equals(clc)) { // clc = close(cabinet)
 			result = model.closeCabinet();
 		} 
+
+		else if (action.getFunctor().equals("getCost") ) {
+			Location dest = model.getLocation(action.getTerm(0).toString());
+			Location cargador =  model.lCargadorRobot;
+			AStar path = new AStar(model, agNum, model.getAgPos(agNum), dest);
+			AStar pathCarga = new AStar(model, agNum, dest, cargador);
+			int costCarga = pathCarga.getCost();
+			int cost = (path.getCost());
+			int costeTotal = cost + costCarga;
+			if( (int)(costeTotal * 1.5)> model.getBateriaRobot(agNum) ){
+				result = false;
+			}else{
+				result =  true;
+			}
+			//System.out.println("Para el robot: "+ agNum+ " Result: " + result);	
+		}
+
+
+		else if (action.getFunctor().equals("getCost2")) {
+			Location dest1 = model.getLocation(action.getTerm(0).toString());
+			Location dest2 = model.getLocation(action.getTerm(1).toString());
+			Location cargador =  model.lCargadorRobot;
+			AStar path1 = new AStar(model, agNum, model.getAgPos(agNum), dest1);
+			AStar path2 = new AStar(model, agNum, dest1, dest2);
+			AStar pathCarga = new AStar(model, agNum, dest2, cargador);
+			int costCarga = pathCarga.getCost();
+			int cost1 = (path1.getCost());
+			int cost2 = (path2.getCost());
+			int costeTotal = cost1 + costCarga + cost2;
+			if( (int)(costeTotal * 1.5)> model.getBateriaRobot(agNum) ){
+				result = false;
+			}else{
+				result =  true;
+			}
+			System.err.println("getCost2("+agNum+"): " + result);
+
+		}
+
+		
+
 		else if (action.getFunctor().equals("move_towards")) {
 			Location dest = model.getLocation(action.getTerm(0).toString());
 			result = model.moveTowards(agNum, dest);
@@ -315,37 +360,10 @@ public class HouseEnv extends Environment {
 			int num = Integer.parseInt(action.getTerm(1).toString());
 			result = model.comprobarConsumo(drug, num);
 		}
+
 		else if (action.getFunctor().equals("updatePercepts")) {
 			result = true;
 		}
-
-		else if (action.getFunctor().equals("addDrug") && ag.equals("auxiliar")) {
-			String drug = action.getTerm(0).toString();
-			int qtd=Integer.parseInt(action.getTerm(1).toString());
-			result=model.addDrug(drug,qtd);
-			model.setAuxiliarCargar(0);
-		}
-
-		else if (action.getFunctor().equals("cargar") && ag.equals("enfermera") || ag.equals("auxiliar")) {
-
-			model.increaseBateriaRobot(agNum);
-			result = true;
-		}
-		/*else if (action.getFunctor().equals("cargar") && ag.equals("auxiliar") || ag.equals("enfermera")) {
-
-			model.increaseBateriaRobot(agNum);
-			result = true; 
-		} */
-
-		else if (action.getFunctor().equals("cargaRapidaEnv") && ag.equals("enfermera")) {
-			model.setBateriaRobot(agNum, (int)(maximaBateria));			
-			result = true; 
-		} 
-
-		else if(action.getFunctor().equals("reducirCapacidad") && ag.equals("enfermera")){
-			maximaBateria = (int)(maximaBateria*0.95);
-		}
-
 
 		else if (action.getFunctor().equals("setMedicamento") && ag.equals("owner")) {
 			
@@ -361,22 +379,6 @@ public class HouseEnv extends Environment {
 			result = true;
 		}
 		
-		
-
-		else if (action.getFunctor().equals("getCost")) {
-			Location dest = model.getLocation(action.getTerm(0).toString());
-			Location cargador =  model.lCargadorRobot;
-			AStar path = new AStar(model, agNum, model.getAgPos(agNum), dest);
-			AStar pathCarga = new AStar(model, agNum, dest, cargador);
-			int costCarga = pathCarga.getCost();
-			int cost = (path.getCost());
-			int costeTotal = cost + costCarga;
-			if( (int)(costeTotal * 1.5)> model.getBateriaRobot(agNum) ){
-				result = false;
-			}else{
-				result =  true;
-			}
-		}
 
 		else if (action.getFunctor().equals("mentirRobot")) {
 			String medicamento = action.getTerm(0).toString();
@@ -402,6 +404,24 @@ public class HouseEnv extends Environment {
 			model.setMedicamentos(medicamento,20);//inicilizamos cada medicamento a 20
 			result = true;			
 		}
+
+		else if (action.getFunctor().equals("cargar") && ag.equals("enfermera") || ag.equals("auxiliar")) {
+
+			model.increaseBateriaRobot(agNum);
+			result = true;
+		}
+
+		
+		
+
+		else if (action.getFunctor().equals("cargaRapidaEnv") && ag.equals("enfermera") || ag.equals("auxiliar")) {
+			model.setBateriaRobot(agNum, (int)(maximaBateria));			
+			result = true; 
+		} 
+
+		else if(action.getFunctor().equals("reducirCapacidad") && ag.equals("enfermera") || ag.equals("auxiliar")){
+			maximaBateria = (int)(maximaBateria*0.95);
+		}
 		
 			
 		else {
@@ -410,7 +430,39 @@ public class HouseEnv extends Environment {
 		if (result) {
 			if(agNum==0 || agNum==2)
 			{
-				model.reduceBateriaRobot(agNum);
+				switch(action.getFunctor().toString()){
+					case "move_towards":
+						coste = 1;
+						break;
+					case "sit":
+						coste = 1;
+						break;
+					case "getCost":
+						coste = 0;
+						break;
+					case "getCost2":
+						coste = 0;
+						break;
+					case "takeDrug":
+						coste = 2;
+						break;
+					case "handDrug":
+						coste = 1;
+						break;
+					case "consume":
+						coste = 1;
+						break;
+					case "cargar":
+						coste = 0;
+						break;	
+					case "reponerMedicamento":
+						coste = 2;
+						break; 
+					case "comprobarConsumo":
+						coste = 3;
+						break;
+				}
+				model.reduceBateriaRobot(agNum,coste);
 				if(model.getBateriaRobot(agNum)%10  == 0){
 					System.out.println("Batería " + ARRAYAG[agNum] + ": " + model.getBateriaRobot(agNum));
 				}

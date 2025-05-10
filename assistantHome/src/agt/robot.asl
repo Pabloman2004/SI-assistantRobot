@@ -46,19 +46,20 @@ cargaRapida(3).
 */
 
 
+
 +!entregarMedicina(L) <- 
-      getCost(washer);
+      getCost2(washer,owner);
 		if(.intend(simulate_behaviour)){
 			.drop_intention(simulate_behaviour);
 		}
-      //!comprobar_bateria_movimiento(washer);
+      
       //.print("Entro aquí1 "); 
       !go_at(enfermera,washer);
       .send(owner,tell,quieto);
       .send(auxiliar,achieve, llevarMedicina(L)). // el robot le dice al auxiliar que le acerque la medicina
 
 
--! entregarMedicina(L)<-
+-!entregarMedicina(L)<-
          .print("Entro aquí2 ");
          .send(auxiliar,achieve,entregarAlOwner(L)); // el robot le dice al auxiliar que le acerque la medicina directamente al owner;
          .print("No tengo bateria suficiente, voy a cargar");
@@ -83,8 +84,9 @@ cargaRapida(3).
 
 //modificar para comprobar bateria
 
-+!bring(owner,L) : getCost(owner)
++!bring(owner,L) 
    <- 
+      getCost(cabinet);
       if(not .belief(comprobarConsumo(_))){
          .send(owner, tell, quieto);
          open(cabinet);
@@ -116,7 +118,7 @@ cargaRapida(3).
 
    -!bring(owner,L) <-
       .print("No tengo bateria suficiente, voy a cargar");
-      .send(owner, achieve, tomar(L)); // si pongo tomarMedicina, el owner puede mentir
+      .send(owner, achieve, tomar(owner,L)); // si pongo tomarMedicina, el owner puede mentir
       !cargar;
       .wait(2000).
 
